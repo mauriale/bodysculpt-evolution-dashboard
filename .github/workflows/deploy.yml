@@ -30,6 +30,32 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install missing shadcn/ui components
+        run: |
+          npx shadcn@latest add card --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add badge --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add tabs --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add button --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add input --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add label --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add progress --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add dialog --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add accordion --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add alert --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add avatar --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add checkbox --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add select --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add separator --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add switch --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add textarea --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add tooltip --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add popover --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add dropdown-menu --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add sheet --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add skeleton --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add slider --yes --overwrite 2>/dev/null || true
+          npx shadcn@latest add scroll-area --yes --overwrite 2>/dev/null || true
+
       - name: Build
         run: npm run build
 
