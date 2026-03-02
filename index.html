@@ -1,12 +1,443 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BodySculpt Evolution Dashboard</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BodySculpt Evolution Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#020617;color:#f8fafc;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+    .header{position:sticky;top:0;z-index:50;background:rgba(2,6,23,.95);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .logo-title{font-size:18px;font-weight:700}
+    .logo-gold{background:linear-gradient(90deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .logo-sub{font-size:11px;color:#64748b}
+    .main{max-width:1280px;margin:0 auto;padding:24px 20px}
+    .tabs{display:flex;gap:4px;background:rgba(15,23,42,.6);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:4px;margin-bottom:28px;flex-wrap:wrap;width:fit-content}
+    .tab{padding:8px 18px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:500;background:transparent;color:#94a3b8;transition:all .2s}
+    .tab.on{background:#f59e0b;color:#020617;font-weight:700}
+    .tab:hover:not(.on){color:#e2e8f0;background:rgba(255,255,255,.05)}
+    .panel{display:none}.panel.on{display:block}
+    .card{background:rgba(15,23,42,.6);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden}
+    .ch{padding:18px 22px 0;font-size:14px;font-weight:600;color:#e2e8f0}
+    .cb{padding:18px 22px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+    .g31{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:22px}
+    .mc{padding:22px;position:relative}
+    .mi{font-size:22px;margin-bottom:10px}
+    .ml{font-size:12px;color:#64748b;margin-bottom:3px}
+    .mv{font-size:28px;font-weight:800;color:#fff}
+    .mu{font-size:13px;color:#475569;margin-left:3px}
+    .mch{position:absolute;top:14px;right:14px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+    .grn{background:rgba(16,185,129,.15);color:#10b981}
+    .amb{background:rgba(245,158,11,.15);color:#f59e0b}
+    .pi{background:rgba(15,23,42,.5);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-bottom:10px}
+    .pt{display:flex;justify-content:space-between;margin-bottom:3px}
+    .pl{font-size:12px;color:#94a3b8}
+    .pp{font-size:12px;font-weight:700;color:#f59e0b}
+    .pv{display:flex;justify-content:space-between;margin-bottom:7px}
+    .pc{font-size:18px;font-weight:700;color:#fff}
+    .ptg{font-size:12px;color:#475569}
+    .pb{height:5px;background:rgba(71,85,105,.4);border-radius:99px;overflow:hidden}
+    .pf{height:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:99px}
+    .kc{padding:16px}
+    .kt{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .kn{font-size:13px;font-weight:600;color:#e2e8f0}
+    .kb{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600}
+    .kv{font-size:24px;font-weight:800;color:#fff}
+    .ki{font-size:12px;color:#475569;margin-left:4px}
+    .kd{font-size:11px;color:#64748b;line-height:1.5;margin:7px 0 10px}
+    .ktip{background:rgba(30,41,59,.8);border:1px solid rgba(71,85,105,.4);border-radius:8px;padding:8px 10px}
+    .ktl{font-size:10px;color:#f59e0b;font-weight:700;margin-bottom:3px}
+    .ktt{font-size:11px;color:#94a3b8;line-height:1.5}
+    table{width:100%;border-collapse:collapse}
+    th{padding:10px 14px;text-align:left;font-size:12px;color:#64748b;border-bottom:1px solid rgba(71,85,105,.4)}
+    th:not(:first-child){text-align:center}
+    td{padding:10px 14px;border-bottom:1px solid rgba(30,41,59,.5)}
+    td:not(:first-child){text-align:center}
+    .wc{background:rgba(15,23,42,.6);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-bottom:14px}
+    .ws{height:3px}
+    .wb{padding:16px 20px}
+    .wh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+    .wpr{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;margin-bottom:4px}
+    .wt{font-size:16px;font-weight:700;color:#fff}
+    .wr{font-size:12px;color:#64748b}
+    .wtgl{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:18px;padding:2px 6px}
+    .wd{overflow:hidden;max-height:0;transition:max-height .3s ease}
+    .wd.on{max-height:500px}
+    .wi{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:10px;margin:10px 0}
+    .wil{font-size:10px;color:#c084fc;font-weight:700;margin-bottom:3px}
+    .wit{font-size:12px;color:#cbd5e1}
+    .wsr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .wst{background:rgba(30,41,59,.6);border-radius:8px;padding:8px;text-align:center}
+    .wsl{font-size:10px;color:#475569;margin-bottom:2px}
+    .wsv{font-size:14px;font-weight:700}
+    .wa{display:flex;gap:8px;margin-bottom:5px;font-size:12px;color:#94a3b8;line-height:1.5}
+    .waw{color:#f59e0b;flex-shrink:0}
+    .ins{display:flex;gap:14px}
+    .ii{width:44px;height:44px;background:rgba(245,158,11,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .it{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px}
+    .ix{font-size:13px;color:#94a3b8;line-height:1.7}
+    .gold{color:#f59e0b;font-weight:600}
+    .green{color:#10b981;font-weight:600}
+    .sb{padding:16px 20px;background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(168,85,247,.08));border:1px solid rgba(245,158,11,.2);border-radius:14px;margin-bottom:18px}
+    .st{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+    .sx{font-size:13px;color:#94a3b8;line-height:1.6}
+    .mbar{display:inline-block;width:70px;height:5px;background:rgba(71,85,105,.4);border-radius:99px;overflow:hidden;vertical-align:middle}
+    .mf{height:100%;border-radius:99px}
+    .cw{position:relative;margin-bottom:22px}
+    @media(max-width:900px){.g4{grid-template-columns:1fr 1fr}.g31{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+    @media(max-width:500px){.g3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🏋️</div>
+    <div>
+      <div class="logo-title">BodySculpt <span class="logo-gold">Evolution</span></div>
+      <div class="logo-sub">Tu transformación física en datos</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#64748b">📅 16–24 Feb 2026</div>
+</header>
+
+<main class="main">
+  <div class="tabs" id="tabs">
+    <button class="tab on" onclick="switchTab('overview')">📊 Resumen</button>
+    <button class="tab" onclick="switchTab('progress')">📈 Progreso</button>
+    <button class="tab" onclick="switchTab('kpis')">🎯 KPIs</button>
+    <button class="tab" onclick="switchTab('wins')">⚡ Quick Wins</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="panel on" id="overview">
+    <div class="g4">
+      <div class="card mc">
+        <div class="mi">⚖️</div><div class="ml">Peso Actual</div>
+        <div><span class="mv">89.03</span><span class="mu">kg</span></div>
+        <div class="mch grn">↓ -3.56 kg</div>
+      </div>
+      <div class="card mc">
+        <div class="mi">💧</div><div class="ml">% Grasa Corporal</div>
+        <div><span class="mv">19.4</span><span class="mu">%</span></div>
+        <div class="mch grn">↓ -3.2%</div>
+      </div>
+      <div class="card mc">
+        <div class="mi">💪</div><div class="ml">Masa Muscular</div>
+        <div><span class="mv">66.72</span><span class="mu">kg</span></div>
+        <div class="mch grn">↑ +1.07 kg</div>
+      </div>
+      <div class="card mc">
+        <div class="mi">📉</div><div class="ml">IMC</div>
+        <div><span class="mv">24.7</span><span class="mu"></span></div>
+        <div class="mch grn">↓ -1.0</div>
+      </div>
+    </div>
+
+    <div class="g31">
+      <div class="card">
+        <div class="ch">📉 Evolución Peso & % Grasa Corporal</div>
+        <div class="cb"><canvas id="chartPeso" height="220"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch">🎯 Objetivos</div>
+        <div class="cb" id="objetivos"></div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid #f59e0b">
+      <div class="cb">
+        <div class="ins">
+          <div class="ii">🏆</div>
+          <div>
+            <div class="it">¡Excelente progreso en 8 días!</div>
+            <p class="ix">Has perdido <span class="gold">3.56 kg</span> y reducido la grasa corporal <span class="gold">3.2%</span>. Tu cintura bajó <span class="green">6 cm</span>, mejorando significativamente el Adonis Index y el V-Taper. Mantén el déficit calórico moderado para preservar masa muscular.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="panel" id="progress">
+    <div class="g2">
+      <div class="card">
+        <div class="ch">💪 Composición Corporal</div>
+        <div class="cb"><canvas id="chartComp" height="210"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch">🍽️ Balance Calórico</div>
+        <div class="cb"><canvas id="chartNutr" height="210"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch">🕸️ Actual vs Ideal por Zona</div>
+      <div class="cb" style="max-width:500px;margin:0 auto"><canvas id="chartRadar" height="280"></canvas></div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="panel" id="kpis">
+    <div class="g3" id="kpiCards"></div>
+    <div class="card">
+      <div class="ch">📊 Tabla Comparativa</div>
+      <div class="cb" style="overflow-x:auto" id="tablaComp"></div>
+    </div>
+  </div>
+
+  <!-- WINS -->
+  <div class="panel" id="wins">
+    <div class="sb">
+      <div class="st">⚡ Estrategia Inteligente de Transformación</div>
+      <p class="sx">Enfócate en los cambios de mayor impacto visual. Reducir cintura y desarrollar hombros generan resultados en 4–8 semanas.</p>
+    </div>
+    <div id="winsCards"></div>
+  </div>
+</main>
+
+<div style="border-top:1px solid rgba(255,255,255,.05);padding:20px;text-align:center;font-size:12px;color:#334155;margin-top:40px">
+  BodySculpt Evolution Dashboard · McCallum Method · Adonis Index · Golden Ratio
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────
+const dias = ['16/2','17/2','18/2','19/2','20/2','21/2','22/2','23/2','24/2'];
+const pesos = [92.59,91.80,91.20,90.75,90.30,89.90,89.50,89.20,89.03];
+const grasas = [22.6,22.1,21.6,21.2,20.8,20.3,19.9,19.6,19.4];
+const diasComp = ['16/2','18/2','20/2','22/2','24/2'];
+const musculos = [65.65,65.80,66.10,66.40,66.72];
+const visceral = [14,13,12,11,10];
+const diasNutr = ['16/2','17/2','18/2','19/2','20/2','21/2','22/2','23/2','24/2'];
+const consumidas = [2100,1950,2200,1800,2050,1900,2150,1950,2000];
+const quemadas = [2650,2600,2750,2500,2700,2580,2720,2620,2680];
+
+const kpis = [
+  {nm:'WHtR', v:(88/190).toFixed(3), t:0.47, ok:88/190<0.5,
+   desc:'Relación cintura/estatura. Indicador de riesgo metabólico. Menos de 0.50 saludable; 0.47 óptimo.',
+   tip:'Reduce cintura 2.5 cm más con déficit calórico y cardio en ayunas 3×/semana.'},
+  {nm:'Adonis Index', v:(125/88).toFixed(3), t:'1.618', ok:Math.abs(125/88-1.618)<0.1,
+   desc:'Ratio hombros/cintura. El número de oro del físico masculino. Objetivo: 1.618.',
+   tip:'Desarrolla deltoides con press militar y elevaciones laterales. Reduce cintura 2-3 cm más.'},
+  {nm:'Golden Ratio', v:(113/88).toFixed(3), t:'1.4', ok:Math.abs(113/88-1.4)<0.08,
+   desc:'Relación pecho/cintura. Indica desarrollo del torso superior. Objetivo: 1.3–1.5.',
+   tip:'Press inclinado y aperturas en cable. Combina con reducción de cintura.'},
+  {nm:'Bíceps/Muñeca', v:(38/17.5).toFixed(2), t:'2.5', ok:38/17.5>=2.4,
+   desc:'Ratio bíceps/muñeca. Indica desarrollo muscular proporcional al frame óseo.',
+   tip:'Faltan 5.75 cm para el ideal. Curl concentrado y martillo 2×/semana.'},
+  {nm:'IMC', v:'24.7', t:'23.5', ok:24.7<25,
+   desc:'IMC corregido por composición corporal. Con alta masa muscular puede estar algo elevado.',
+   tip:'Al ganar músculo y perder grasa el IMC bajará. Objetivo: 23–24 manteniendo masa magra.'},
+  {nm:'Grasa Visceral', v:'10', t:'7', ok:10<=9,
+   desc:'Grasa visceral (escala 1–59). Nivel 1–9 saludable; 10+ elevado.',
+   tip:'20–30 min de cardio MISS post-entrenamiento. Sueño 7–8h para regular cortisol.'},
+];
+
+const zones = [
+  {z:'Hombros',a:125,id:138.3,u:'cm',title:'Desarrollar Hombros',
+   reason:'Factor #1 del V-Taper y el Adonis Index.',
+   impact:'Cada 2 cm mejora el Adonis Index ~0.025.',tl:'12–16 sem',
+   pc:'linear-gradient(90deg,#f43f5e,#dc2626)',pt:'CRÍTICO',pb:'rgba(244,63,94,.15)',pcc:'#f43f5e',
+   acts:['Press militar barra 3×5','Elevaciones laterales 4×15','Face pulls 3×20','2–3 veces/semana']},
+  {z:'Cintura',a:88,id:85.5,u:'cm',title:'Reducir Cintura a 85.5 cm',
+   reason:'Denominador de todos los ratios corporales.',
+   impact:'Faltan 2.5 cm. Cada cm menos = +0.017 Adonis Index.',tl:'4–6 sem',
+   pc:'linear-gradient(90deg,#f43f5e,#dc2626)',pt:'CRÍTICO',pb:'rgba(244,63,94,.15)',pcc:'#f43f5e',
+   acts:['Déficit 400–500 kcal/día','Cardio en ayunas 30min 4×/semana','Reducir sodio y carbos refinados','Planchas y vacuum abdominal']},
+  {z:'Bíceps',a:38,id:43.75,u:'cm',title:'Ganar Masa en Bíceps',
+   reason:'Ratio bíceps/muñeca (2.17 vs 2.5 ideal).',
+   impact:'5.75 cm para el ideal. Visible en camiseta.',tl:'16–24 sem',
+   pc:'linear-gradient(90deg,#f97316,#d97706)',pt:'ALTA',pb:'rgba(249,115,22,.15)',pcc:'#f97316',
+   acts:['Curl barra EZ 4×8–10','Curl martillo 3×12','Curl concentrado 3×12','Máx. 2 días directos/semana']},
+  {z:'Pecho',a:113,id:113.75,u:'cm',title:'Volumen en Pecho',
+   reason:'Pecho casi en el ideal. Ajuste mejora el Golden Ratio.',
+   impact:'Mejora visual del torso y Golden Ratio pecho/cintura.',tl:'4–8 sem',
+   pc:'linear-gradient(90deg,#f59e0b,#eab308)',pt:'MEDIA',pb:'rgba(245,158,11,.15)',pcc:'#f59e0b',
+   acts:['Press banca inclinado 4×6–8','Press mancuernas plano 3×12','Aperturas en cable 3×15']},
+  {z:'Muslo',a:56,id:66.7,u:'cm',title:'Desarrollar Cuádriceps',
+   reason:'Proporción muslo/cintura para equilibrio visual.',
+   impact:'Equilibrio corporal y simetría del físico.',tl:'20–30 sem',
+   pc:'linear-gradient(90deg,#f59e0b,#eab308)',pt:'MEDIA',pb:'rgba(245,158,11,.15)',pcc:'#f59e0b',
+   acts:['Sentadilla trasera 4×5–8','Prensa de piernas 3×12–15','Extensiones cuádriceps 3×15']},
+];
+
+// ─── TAB SWITCHING ────────────────────────────
+let chartsInit = false;
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('on', ['overview','progress','kpis','wins'][i]===id);
+  });
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on')});
+  document.getElementById(id).classList.add('on');
+  if(!chartsInit){initCharts();chartsInit=true;}
+}
+
+// ─── OBJETIVOS ────────────────────────────────
+function calcPct(cur,tgt,start){
+  const t=Math.abs(tgt-start);
+  return t?Math.min(Math.abs(cur-start)/t*100,100):100;
+}
+const goals=[
+  {lbl:'Peso → 83 kg',cur:89.03,tgt:83,start:92.59,u:'kg'},
+  {lbl:'Grasa → 13%',cur:19.4,tgt:13,start:22.6,u:'%'},
+  {lbl:'Músculo → 69 kg',cur:66.72,tgt:69,start:65.65,u:'kg'},
+  {lbl:'G. Visceral → 5',cur:10,tgt:5,start:14,u:''},
+];
+const obEl=document.getElementById('objetivos');
+obEl.style.display='flex';obEl.style.flexDirection='column';obEl.style.gap='10px';
+goals.forEach(g=>{
+  const p=calcPct(g.cur,g.tgt,g.start);
+  obEl.innerHTML+=`<div class="pi">
+    <div class="pt"><span class="pl">${g.lbl}</span><span class="pp">${p.toFixed(1)}%</span></div>
+    <div class="pv"><span class="pc">${g.cur}<span style="font-size:11px;color:#475569;margin-left:2px">${g.u}</span></span><span class="ptg">→ ${g.tgt}${g.u}</span></div>
+    <div class="pb"><div class="pf" style="width:${p}%"></div></div>
+  </div>`;
+});
+
+// ─── KPI CARDS ────────────────────────────────
+const kpiEl=document.getElementById('kpiCards');
+kpis.forEach(k=>{
+  kpiEl.innerHTML+=`<div class="card kc">
+    <div class="kt">
+      <span class="kn">${k.nm}</span>
+      <span class="kb" style="background:${k.ok?'rgba(16,185,129,.15)':'rgba(245,158,11,.15)'};color:${k.ok?'#10b981':'#f59e0b'}">${k.ok?'✓ Óptimo':'En progreso'}</span>
+    </div>
+    <div><span class="kv">${k.v}</span><span class="ki">/ ${k.t}</span></div>
+    <div class="kd">${k.desc}</div>
+    <div class="ktip"><div class="ktl">🎯 ACCIÓN:</div><div class="ktt">${k.tip}</div></div>
+  </div>`;
+});
+
+// ─── TABLA ────────────────────────────────────
+const tabEl=document.getElementById('tablaComp');
+let rows='';
+zones.forEach(z=>{
+  const diff=z.a-z.id,p=z.a/z.id*100;
+  const ok=p>=95&&p<=105,hi=p>105;
+  const col=ok?'#10b981':hi?'#ef4444':'#f59e0b';
+  rows+=`<tr>
+    <td style="font-weight:600;color:#e2e8f0">${z.z}</td>
+    <td style="color:#cbd5e1">${z.a.toFixed(1)} ${z.u}</td>
+    <td style="color:#f59e0b">${z.id.toFixed(1)} ${z.u}</td>
+    <td style="color:${diff>0?'#ef4444':'#10b981'};font-weight:600">${diff>0?'+':''}${diff.toFixed(1)} ${z.u}</td>
+    <td><span style="color:${col};font-weight:700">${p.toFixed(1)}%</span></td>
+    <td><div class="mbar"><div class="mf" style="width:${Math.min(p,100)}%;background:${col}"></div></div></td>
+  </tr>`;
+});
+tabEl.innerHTML=`<table><thead><tr><th>Zona</th><th>Actual</th><th>Ideal</th><th>Diferencia</th><th>% Ideal</th><th>Progreso</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+// ─── QUICK WINS ───────────────────────────────
+const winsEl=document.getElementById('winsCards');
+zones.forEach((w,i)=>{
+  winsEl.innerHTML+=`<div class="wc">
+    <div class="ws" style="background:${w.pc}"></div>
+    <div class="wb">
+      <div class="wh">
+        <div>
+          <span class="wpr" style="background:${w.pb};color:${w.pcc}">${w.pt}</span>
+          <div class="wt">${w.title}</div>
+        </div>
+        <button class="wtgl" onclick="toggleWin(${i})">▼</button>
+      </div>
+      <p class="wr">${w.reason}</p>
+      <div class="wd" id="wd${i}">
+        <div class="wi"><div class="wil">💡 IMPACTO:</div><div class="wit">${w.impact}</div></div>
+        <div class="wsr">
+          <div class="wst"><div class="wsl">Diferencia</div><div class="wsv" style="color:#f59e0b">${Math.abs(w.a-w.id).toFixed(1)} cm</div></div>
+          <div class="wst"><div class="wsl">Timeline</div><div class="wsv" style="color:#10b981">${w.tl}</div></div>
+        </div>
+        <div style="font-weight:600;font-size:12px;color:#cbd5e1;margin-bottom:8px">Acciones:</div>
+        ${w.acts.map(a=>`<div class="wa"><span class="waw">→</span>${a}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+});
+
+function toggleWin(i){
+  const d=document.getElementById('wd'+i);
+  d.classList.toggle('on');
+  const btn=d.closest('.wc').querySelector('.wtgl');
+  btn.textContent=d.classList.contains('on')?'▲':'▼';
+}
+
+// ─── CHARTS ───────────────────────────────────
+function initCharts(){
+  const base={color:'#94a3b8',grid:{color:'#1e293b'},ticks:{color:'#94a3b8',font:{size:11}}};
+
+  // Peso & Grasa
+  new Chart(document.getElementById('chartPeso'),{
+    type:'line',
+    data:{
+      labels:dias,
+      datasets:[
+        {label:'Peso (kg)',data:pesos,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.12)',tension:.3,yAxisID:'y',pointRadius:3,borderWidth:2.5,fill:true},
+        {label:'% Grasa',data:grasas,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.1)',tension:.3,yAxisID:'y2',pointRadius:3,borderWidth:2.5,fill:true},
+      ]
+    },
+    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
+      x:{...base.grid,...{ticks:{color:'#64748b',font:{size:10}}}},
+      y:{...base,min:88,max:94,title:{display:true,text:'Peso (kg)',color:'#f59e0b',font:{size:10}}},
+      y2:{...base,min:18,max:24,position:'right',title:{display:true,text:'% Grasa',color:'#a855f7',font:{size:10}},grid:{display:false}},
+    }}
+  });
+
+  // Composición
+  new Chart(document.getElementById('chartComp'),{
+    type:'line',
+    data:{
+      labels:diasComp,
+      datasets:[
+        {label:'Masa Muscular (kg)',data:musculos,borderColor:'#06b6d4',tension:.3,yAxisID:'y',pointRadius:4,borderWidth:2.5,backgroundColor:'rgba(6,182,212,.1)',fill:true},
+        {label:'Grasa Visceral',data:visceral,borderColor:'#f59e0b',tension:.3,yAxisID:'y2',pointRadius:4,borderWidth:2.5,backgroundColor:'rgba(245,158,11,.1)',fill:true},
+      ]
+    },
+    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
+      x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#1e293b'}},
+      y:{ticks:{color:'#06b6d4',font:{size:10}},min:65,max:68,grid:{color:'#1e293b'}},
+      y2:{ticks:{color:'#f59e0b',font:{size:10}},min:9,max:15,position:'right',grid:{display:false}},
+    }}
+  });
+
+  // Nutrición
+  new Chart(document.getElementById('chartNutr'),{
+    type:'bar',
+    data:{
+      labels:diasNutr,
+      datasets:[
+        {label:'Consumidas (kcal)',data:consumidas,backgroundColor:'rgba(16,185,129,.7)',borderRadius:4},
+        {label:'Quemadas (kcal)',data:quemadas,backgroundColor:'rgba(245,158,11,.7)',borderRadius:4},
+      ]
+    },
+    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
+      x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#1e293b'}},
+      y:{ticks:{color:'#94a3b8',font:{size:10}},min:1500,max:3000,grid:{color:'#1e293b'}},
+    }}
+  });
+
+  // Radar
+  new Chart(document.getElementById('chartRadar'),{
+    type:'radar',
+    data:{
+      labels:zones.map(z=>z.z),
+      datasets:[
+        {label:'Actual (% del ideal)',data:zones.map(z=>Math.round(z.a/z.id*100)),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.2)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#f59e0b'},
+        {label:'Objetivo 100%',data:zones.map(()=>100),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.06)',borderWidth:1.5,borderDash:[5,5],pointRadius:0},
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
+      r:{ticks:{color:'#334155',backdropColor:'transparent',font:{size:10}},grid:{color:'#1e293b'},pointLabels:{color:'#94a3b8',font:{size:12}},min:0,max:110,},
+    }}
+  });
+}
+
+// Init charts on first load for overview tab
+initCharts();
+chartsInit=true;
+</script>
+</body>
 </html>
