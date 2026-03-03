@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BodySculpt Evolution Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{background:#020617;color:#f8fafc;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-    .header{position:sticky;top:0;z-index:50;background:rgba(2,6,23,.95);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+    .header{position:sticky;top:0;z-index:50;background:rgba(2,6,23,.97);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .logo{display:flex;align-items:center;gap:12px}
-    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
     .logo-title{font-size:18px;font-weight:700}
     .logo-gold{background:linear-gradient(90deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .logo-sub{font-size:11px;color:#64748b}
+    .date-pill{font-size:12px;color:#64748b;background:rgba(30,41,59,.6);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:5px 12px}
     .main{max-width:1280px;margin:0 auto;padding:24px 20px}
     .tabs{display:flex;gap:4px;background:rgba(15,23,42,.6);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:4px;margin-bottom:28px;flex-wrap:wrap;width:fit-content}
-    .tab{padding:8px 18px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:500;background:transparent;color:#94a3b8;transition:all .2s}
+    .tab{padding:8px 18px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:500;background:transparent;color:#94a3b8;transition:all .2s;white-space:nowrap}
     .tab.on{background:#f59e0b;color:#020617;font-weight:700}
     .tab:hover:not(.on){color:#e2e8f0;background:rgba(255,255,255,.05)}
     .panel{display:none}.panel.on{display:block}
@@ -34,13 +35,14 @@
     .mu{font-size:13px;color:#475569;margin-left:3px}
     .mch{position:absolute;top:14px;right:14px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
     .grn{background:rgba(16,185,129,.15);color:#10b981}
+    .red{background:rgba(239,68,68,.15);color:#ef4444}
     .amb{background:rgba(245,158,11,.15);color:#f59e0b}
     .pi{background:rgba(15,23,42,.5);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-bottom:10px}
     .pt{display:flex;justify-content:space-between;margin-bottom:3px}
     .pl{font-size:12px;color:#94a3b8}
     .pp{font-size:12px;font-weight:700;color:#f59e0b}
     .pv{display:flex;justify-content:space-between;margin-bottom:7px}
-    .pc{font-size:18px;font-weight:700;color:#fff}
+    .pc2{font-size:18px;font-weight:700;color:#fff}
     .ptg{font-size:12px;color:#475569}
     .pb{height:5px;background:rgba(71,85,105,.4);border-radius:99px;overflow:hidden}
     .pf{height:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:99px}
@@ -59,6 +61,7 @@
     th:not(:first-child){text-align:center}
     td{padding:10px 14px;border-bottom:1px solid rgba(30,41,59,.5)}
     td:not(:first-child){text-align:center}
+    tr:hover td{background:rgba(255,255,255,.02)}
     .wc{background:rgba(15,23,42,.6);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-bottom:14px}
     .ws{height:3px}
     .wb{padding:16px 20px}
@@ -68,12 +71,12 @@
     .wr{font-size:12px;color:#64748b}
     .wtgl{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:18px;padding:2px 6px}
     .wd{overflow:hidden;max-height:0;transition:max-height .3s ease}
-    .wd.on{max-height:500px}
+    .wd.on{max-height:600px}
     .wi{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:10px;margin:10px 0}
     .wil{font-size:10px;color:#c084fc;font-weight:700;margin-bottom:3px}
     .wit{font-size:12px;color:#cbd5e1}
     .wsr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-    .wst{background:rgba(30,41,59,.6);border-radius:8px;padding:8px;text-align:center}
+    .wst2{background:rgba(30,41,59,.6);border-radius:8px;padding:8px;text-align:center}
     .wsl{font-size:10px;color:#475569;margin-bottom:2px}
     .wsv{font-size:14px;font-weight:700}
     .wa{display:flex;gap:8px;margin-bottom:5px;font-size:12px;color:#94a3b8;line-height:1.5}
@@ -84,14 +87,28 @@
     .ix{font-size:13px;color:#94a3b8;line-height:1.7}
     .gold{color:#f59e0b;font-weight:600}
     .green{color:#10b981;font-weight:600}
+    .red2{color:#ef4444;font-weight:600}
     .sb{padding:16px 20px;background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(168,85,247,.08));border:1px solid rgba(245,158,11,.2);border-radius:14px;margin-bottom:18px}
     .st{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
     .sx{font-size:13px;color:#94a3b8;line-height:1.6}
     .mbar{display:inline-block;width:70px;height:5px;background:rgba(71,85,105,.4);border-radius:99px;overflow:hidden;vertical-align:middle}
     .mf{height:100%;border-radius:99px}
-    .cw{position:relative;margin-bottom:22px}
-    @media(max-width:900px){.g4{grid-template-columns:1fr 1fr}.g31{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
-    @media(max-width:500px){.g3{grid-template-columns:1fr}}
+    /* Alerta variación */
+    .alert-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:14px 18px;margin-bottom:22px;display:flex;gap:12px;align-items:flex-start}
+    .alert-icon{font-size:20px;flex-shrink:0}
+    .alert-title{font-size:14px;font-weight:700;color:#fca5a5;margin-bottom:4px}
+    .alert-text{font-size:12px;color:#94a3b8;line-height:1.6}
+    /* Snapshot 3 fechas */
+    .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+    .snap-card{background:rgba(15,23,42,.5);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:16px}
+    .snap-date{font-size:11px;color:#64748b;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .snap-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(30,41,59,.5)}
+    .snap-row:last-child{border-bottom:none}
+    .snap-label{font-size:11px;color:#64748b}
+    .snap-val{font-size:13px;font-weight:700;color:#fff}
+    .snap-delta{font-size:10px;font-weight:600;margin-left:4px}
+    @media(max-width:900px){.g4{grid-template-columns:1fr 1fr}.g31{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.snap-grid{grid-template-columns:1fr}}
+    @media(max-width:500px){.g3{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
@@ -101,10 +118,10 @@
     <div class="logo-icon">🏋️</div>
     <div>
       <div class="logo-title">BodySculpt <span class="logo-gold">Evolution</span></div>
-      <div class="logo-sub">Tu transformación física en datos</div>
+      <div class="logo-sub">Datos reales · Excel Tracker</div>
     </div>
   </div>
-  <div style="font-size:12px;color:#64748b">📅 16–24 Feb 2026</div>
+  <div class="date-pill">📅 16 Feb – 01 Mar 2026</div>
 </header>
 
 <main class="main">
@@ -117,47 +134,67 @@
 
   <!-- OVERVIEW -->
   <div class="panel on" id="overview">
-    <div class="g4">
-      <div class="card mc">
-        <div class="mi">⚖️</div><div class="ml">Peso Actual</div>
-        <div><span class="mv">89.03</span><span class="mu">kg</span></div>
-        <div class="mch grn">↓ -3.56 kg</div>
-      </div>
-      <div class="card mc">
-        <div class="mi">💧</div><div class="ml">% Grasa Corporal</div>
-        <div><span class="mv">19.4</span><span class="mu">%</span></div>
-        <div class="mch grn">↓ -3.2%</div>
-      </div>
-      <div class="card mc">
-        <div class="mi">💪</div><div class="ml">Masa Muscular</div>
-        <div><span class="mv">66.72</span><span class="mu">kg</span></div>
-        <div class="mch grn">↑ +1.07 kg</div>
-      </div>
-      <div class="card mc">
-        <div class="mi">📉</div><div class="ml">IMC</div>
-        <div><span class="mv">24.7</span><span class="mu"></span></div>
-        <div class="mch grn">↓ -1.0</div>
+
+    <!-- Alert variación 01/03 -->
+    <div class="alert-box">
+      <div class="alert-icon">⚠️</div>
+      <div>
+        <div class="alert-title">Variación en medición del 01/03</div>
+        <div class="alert-text">El 01/03 el peso subió +0.58 kg y el % grasa +0.33% respecto al 24/02. Esto es normal: retención de agua, variaciones del ciclo, músculo glucogénico post-entrenamiento. La cintura sí bajó 1 cm más (93 cm). <strong style="color:#fbbf24">El progreso global desde el inicio sigue siendo excelente.</strong></div>
       </div>
     </div>
 
+    <!-- Métricas principales -->
+    <div class="g4">
+      <div class="card mc">
+        <div class="mi">⚖️</div><div class="ml">Peso Actual (01/03)</div>
+        <div><span class="mv">89.17</span><span class="mu">kg</span></div>
+        <div class="mch grn">↓ -2.98 kg total</div>
+      </div>
+      <div class="card mc">
+        <div class="mi">💧</div><div class="ml">% Grasa (01/03)</div>
+        <div><span class="mv">22.93</span><span class="mu">%</span></div>
+        <div class="mch grn">↓ -2.87% total</div>
+      </div>
+      <div class="card mc">
+        <div class="mi">💪</div><div class="ml">Masa Muscular (01/03)</div>
+        <div><span class="mv">64.99</span><span class="mu">kg</span></div>
+        <div class="mch red">↓ -0.66 kg total</div>
+      </div>
+      <div class="card mc">
+        <div class="mi">📏</div><div class="ml">Cintura (01/03)</div>
+        <div><span class="mv">93</span><span class="mu">cm</span></div>
+        <div class="mch grn">↓ -7 cm total</div>
+      </div>
+    </div>
+
+    <!-- Gráfico + Objetivos -->
     <div class="g31">
       <div class="card">
-        <div class="ch">📉 Evolución Peso & % Grasa Corporal</div>
-        <div class="cb"><canvas id="chartPeso" height="220"></canvas></div>
+        <div class="ch">📉 Evolución: Peso & % Grasa Corporal</div>
+        <div class="cb"><canvas id="chartPeso" height="240"></canvas></div>
       </div>
       <div class="card">
-        <div class="ch">🎯 Objetivos</div>
+        <div class="ch">🎯 Progreso hacia Objetivos</div>
         <div class="cb" id="objetivos"></div>
       </div>
     </div>
 
+    <!-- Snapshot 3 fechas -->
+    <div class="ch" style="margin-bottom:12px;font-size:13px;color:#64748b">📋 Snapshot comparativo de medidas</div>
+    <div class="snap-grid" id="snapGrid"></div>
+
+    <!-- Insight -->
     <div class="card" style="border-left:4px solid #f59e0b">
       <div class="cb">
         <div class="ins">
           <div class="ii">🏆</div>
           <div>
-            <div class="it">¡Excelente progreso en 8 días!</div>
-            <p class="ix">Has perdido <span class="gold">3.56 kg</span> y reducido la grasa corporal <span class="gold">3.2%</span>. Tu cintura bajó <span class="green">6 cm</span>, mejorando significativamente el Adonis Index y el V-Taper. Mantén el déficit calórico moderado para preservar masa muscular.</p>
+            <div class="it">13 días de transformación real</div>
+            <p class="ix">
+              Desde el <strong style="color:#fff">16 Feb</strong>: cintura <span class="gold">-7 cm</span> (100→93), peso <span class="gold">-2.98 kg</span>, IMC bajó de <span class="gold">25.53 → 24.96</span>.<br>
+              El 01/03 hubo una pequeña variación al alza en peso/grasa — completamente normal. Lo importante: <span class="green">la cintura siguió bajando</span>, que es el indicador más fiable de pérdida de grasa real.
+            </p>
           </div>
         </div>
       </div>
@@ -168,17 +205,23 @@
   <div class="panel" id="progress">
     <div class="g2">
       <div class="card">
-        <div class="ch">💪 Composición Corporal</div>
-        <div class="cb"><canvas id="chartComp" height="210"></canvas></div>
+        <div class="ch">💪 Composición Corporal (5 mediciones)</div>
+        <div class="cb"><canvas id="chartComp" height="220"></canvas></div>
       </div>
       <div class="card">
-        <div class="ch">🍽️ Balance Calórico</div>
-        <div class="cb"><canvas id="chartNutr" height="210"></canvas></div>
+        <div class="ch">🍽️ Balance Calórico (Feb)</div>
+        <div class="cb"><canvas id="chartNutr" height="220"></canvas></div>
       </div>
     </div>
-    <div class="card">
-      <div class="ch">🕸️ Actual vs Ideal por Zona</div>
-      <div class="cb" style="max-width:500px;margin:0 auto"><canvas id="chartRadar" height="280"></canvas></div>
+    <div class="g2">
+      <div class="card">
+        <div class="ch">📐 Evolución Medidas Corporales</div>
+        <div class="cb"><canvas id="chartMedidas" height="220"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch">🕸️ Actual vs Ideal — 01/03</div>
+        <div class="cb" style="max-width:420px;margin:0 auto"><canvas id="chartRadar" height="260"></canvas></div>
+      </div>
     </div>
   </div>
 
@@ -186,7 +229,7 @@
   <div class="panel" id="kpis">
     <div class="g3" id="kpiCards"></div>
     <div class="card">
-      <div class="ch">📊 Tabla Comparativa</div>
+      <div class="ch">📊 Tabla Comparativa — Medidas vs Ideal (01/03)</div>
       <div class="cb" style="overflow-x:auto" id="tablaComp"></div>
     </div>
   </div>
@@ -195,114 +238,174 @@
   <div class="panel" id="wins">
     <div class="sb">
       <div class="st">⚡ Estrategia Inteligente de Transformación</div>
-      <p class="sx">Enfócate en los cambios de mayor impacto visual. Reducir cintura y desarrollar hombros generan resultados en 4–8 semanas.</p>
+      <p class="sx">Basado en tus medidas reales del 01/03. Prioridad 1: reducir cintura 7.5 cm más y desarrollar hombros 15 cm — esto dispara el Adonis Index de 1.323 a 1.618.</p>
     </div>
     <div id="winsCards"></div>
   </div>
 </main>
 
 <div style="border-top:1px solid rgba(255,255,255,.05);padding:20px;text-align:center;font-size:12px;color:#334155;margin-top:40px">
-  BodySculpt Evolution Dashboard · McCallum Method · Adonis Index · Golden Ratio
+  BodySculpt Evolution · Datos reales del Excel Tracker · McCallum · Adonis Index · Golden Ratio
 </div>
 
 <script>
-// ─── DATA ──────────────────────────────────────
-const dias = ['16/2','17/2','18/2','19/2','20/2','21/2','22/2','23/2','24/2'];
-const pesos = [92.59,91.80,91.20,90.75,90.30,89.90,89.50,89.20,89.03];
-const grasas = [22.6,22.1,21.6,21.2,20.8,20.3,19.9,19.6,19.4];
-const diasComp = ['16/2','18/2','20/2','22/2','24/2'];
-const musculos = [65.65,65.80,66.10,66.40,66.72];
-const visceral = [14,13,12,11,10];
-const diasNutr = ['16/2','17/2','18/2','19/2','20/2','21/2','22/2','23/2','24/2'];
-const consumidas = [2100,1950,2200,1800,2050,1900,2150,1950,2000];
-const quemadas = [2650,2600,2750,2500,2700,2580,2720,2620,2680];
+// ═══════════════════════════════════════════════
+// DATOS REALES DEL EXCEL
+// ═══════════════════════════════════════════════
 
-const kpis = [
-  {nm:'WHtR', v:(88/190).toFixed(3), t:0.47, ok:88/190<0.5,
-   desc:'Relación cintura/estatura. Indicador de riesgo metabólico. Menos de 0.50 saludable; 0.47 óptimo.',
-   tip:'Reduce cintura 2.5 cm más con déficit calórico y cardio en ayunas 3×/semana.'},
-  {nm:'Adonis Index', v:(125/88).toFixed(3), t:'1.618', ok:Math.abs(125/88-1.618)<0.1,
-   desc:'Ratio hombros/cintura. El número de oro del físico masculino. Objetivo: 1.618.',
-   tip:'Desarrolla deltoides con press militar y elevaciones laterales. Reduce cintura 2-3 cm más.'},
-  {nm:'Golden Ratio', v:(113/88).toFixed(3), t:'1.4', ok:Math.abs(113/88-1.4)<0.08,
-   desc:'Relación pecho/cintura. Indica desarrollo del torso superior. Objetivo: 1.3–1.5.',
-   tip:'Press inclinado y aperturas en cable. Combina con reducción de cintura.'},
-  {nm:'Bíceps/Muñeca', v:(38/17.5).toFixed(2), t:'2.5', ok:38/17.5>=2.4,
-   desc:'Ratio bíceps/muñeca. Indica desarrollo muscular proporcional al frame óseo.',
-   tip:'Faltan 5.75 cm para el ideal. Curl concentrado y martillo 2×/semana.'},
-  {nm:'IMC', v:'24.7', t:'23.5', ok:24.7<25,
-   desc:'IMC corregido por composición corporal. Con alta masa muscular puede estar algo elevado.',
-   tip:'Al ganar músculo y perder grasa el IMC bajará. Objetivo: 23–24 manteniendo masa magra.'},
-  {nm:'Grasa Visceral', v:'10', t:'7', ok:10<=9,
-   desc:'Grasa visceral (escala 1–59). Nivel 1–9 saludable; 10+ elevado.',
-   tip:'20–30 min de cardio MISS post-entrenamiento. Sueño 7–8h para regular cortisol.'},
+// Histórico_Medidas (3 fechas reales)
+const medidas = [
+  {d:'16 Feb', peso:92.15, grasa:25.8,  imc:25.53, cintura:100, hombros:120, pecho:114, biceps:39, antebrazo:32, cadera:97, muslo:59, pantorrilla:39, munieca:17.5},
+  {d:'24 Feb', peso:88.59, grasa:22.6,  imc:24.54, cintura:94,  hombros:125, pecho:113, biceps:38, antebrazo:33, cadera:94, muslo:56, pantorrilla:39, munieca:17.5},
+  {d:'01 Mar', peso:89.17, grasa:22.93, imc:24.96, cintura:93,  hombros:123, pecho:114, biceps:38, antebrazo:33, cadera:94, muslo:56, pantorrilla:39, munieca:17.5},
 ];
 
-const zones = [
-  {z:'Hombros',a:125,id:138.3,u:'cm',title:'Desarrollar Hombros',
-   reason:'Factor #1 del V-Taper y el Adonis Index.',
-   impact:'Cada 2 cm mejora el Adonis Index ~0.025.',tl:'12–16 sem',
-   pc:'linear-gradient(90deg,#f43f5e,#dc2626)',pt:'CRÍTICO',pb:'rgba(244,63,94,.15)',pcc:'#f43f5e',
-   acts:['Press militar barra 3×5','Elevaciones laterales 4×15','Face pulls 3×20','2–3 veces/semana']},
-  {z:'Cintura',a:88,id:85.5,u:'cm',title:'Reducir Cintura a 85.5 cm',
-   reason:'Denominador de todos los ratios corporales.',
-   impact:'Faltan 2.5 cm. Cada cm menos = +0.017 Adonis Index.',tl:'4–6 sem',
-   pc:'linear-gradient(90deg,#f43f5e,#dc2626)',pt:'CRÍTICO',pb:'rgba(244,63,94,.15)',pcc:'#f43f5e',
-   acts:['Déficit 400–500 kcal/día','Cardio en ayunas 30min 4×/semana','Reducir sodio y carbos refinados','Planchas y vacuum abdominal']},
-  {z:'Bíceps',a:38,id:43.75,u:'cm',title:'Ganar Masa en Bíceps',
-   reason:'Ratio bíceps/muñeca (2.17 vs 2.5 ideal).',
-   impact:'5.75 cm para el ideal. Visible en camiseta.',tl:'16–24 sem',
-   pc:'linear-gradient(90deg,#f97316,#d97706)',pt:'ALTA',pb:'rgba(249,115,22,.15)',pcc:'#f97316',
-   acts:['Curl barra EZ 4×8–10','Curl martillo 3×12','Curl concentrado 3×12','Máx. 2 días directos/semana']},
-  {z:'Pecho',a:113,id:113.75,u:'cm',title:'Volumen en Pecho',
-   reason:'Pecho casi en el ideal. Ajuste mejora el Golden Ratio.',
-   impact:'Mejora visual del torso y Golden Ratio pecho/cintura.',tl:'4–8 sem',
-   pc:'linear-gradient(90deg,#f59e0b,#eab308)',pt:'MEDIA',pb:'rgba(245,158,11,.15)',pcc:'#f59e0b',
-   acts:['Press banca inclinado 4×6–8','Press mancuernas plano 3×12','Aperturas en cable 3×15']},
-  {z:'Muslo',a:56,id:66.7,u:'cm',title:'Desarrollar Cuádriceps',
-   reason:'Proporción muslo/cintura para equilibrio visual.',
-   impact:'Equilibrio corporal y simetría del físico.',tl:'20–30 sem',
-   pc:'linear-gradient(90deg,#f59e0b,#eab308)',pt:'MEDIA',pb:'rgba(245,158,11,.15)',pcc:'#f59e0b',
-   acts:['Sentadilla trasera 4×5–8','Prensa de piernas 3×12–15','Extensiones cuádriceps 3×15']},
+// Composición_Detallada (5 mediciones reales)
+const composicion = [
+  {d:'16 Feb', musculo:65.65, visceral:14, subcutanea:19.18, agua:50.65, proteina:16.48},
+  {d:'19 Feb', musculo:64.88, visceral:13, subcutanea:18.49, agua:50.08, proteina:16.62},
+  {d:'21 Feb', musculo:64.27, visceral:13, subcutanea:18.10, agua:56.66, proteina:14.63},
+  {d:'24 Feb', musculo:64.78, visceral:13, subcutanea:18.30, agua:56.46, proteina:16.67},
+  {d:'01 Mar', musculo:64.99, visceral:13, subcutanea:18.51, agua:56.26, proteina:14.82},
 ];
 
-// ─── TAB SWITCHING ────────────────────────────
-let chartsInit = false;
+// Consumo_Alimenticio (7 días reales)
+const nutricion = [
+  {d:'16 Feb', consumidas:1093, quemadas:987},
+  {d:'17 Feb', consumidas:1510, quemadas:323},
+  {d:'18 Feb', consumidas:991,  quemadas:870},
+  {d:'19 Feb', consumidas:1137, quemadas:688},
+  {d:'20 Feb', consumidas:773,  quemadas:1344},
+  {d:'21 Feb', consumidas:1706, quemadas:1050},
+  {d:'22 Feb', consumidas:1928, quemadas:214},
+];
+
+// Valores_Objetivo (del Excel)
+const targets = {
+  peso:83, imc:23, grasa:0.13*100, musculo:69, visceral:5,
+  hombros:138.3, pecho:113.8, cintura:85.5, cadera:94.1,
+  biceps:43.8, antebrazo:35.0, muslo:66.7, pantorrilla:43.8,
+};
+
+const inicio = medidas[0];
+const ultimo = medidas[medidas.length - 1];
+const lcComp = composicion[composicion.length - 1];
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function pct(cur, tgt, start) {
+  const t = Math.abs(tgt - start);
+  return t ? Math.min(Math.abs(cur - start) / t * 100, 100) : 100;
+}
+function delta(cur, start) {
+  const d = cur - start;
+  return (d > 0 ? '+' : '') + d.toFixed(2);
+}
+function deltaColor(cur, start, lowerIsBetter=false) {
+  const better = lowerIsBetter ? cur < start : cur > start;
+  return better ? '#10b981' : '#ef4444';
+}
+
+// ═══════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════
+let chartsInited = false;
 function switchTab(id) {
-  document.querySelectorAll('.tab').forEach((b,i)=>{
-    b.classList.toggle('on', ['overview','progress','kpis','wins'][i]===id);
+  document.querySelectorAll('.tab').forEach((b,i) => {
+    b.classList.toggle('on', ['overview','progress','kpis','wins'][i] === id);
   });
-  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on')});
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
   document.getElementById(id).classList.add('on');
-  if(!chartsInit){initCharts();chartsInit=true;}
+  if (!chartsInited) { initCharts(); chartsInited = true; }
 }
 
-// ─── OBJETIVOS ────────────────────────────────
-function calcPct(cur,tgt,start){
-  const t=Math.abs(tgt-start);
-  return t?Math.min(Math.abs(cur-start)/t*100,100):100;
-}
-const goals=[
-  {lbl:'Peso → 83 kg',cur:89.03,tgt:83,start:92.59,u:'kg'},
-  {lbl:'Grasa → 13%',cur:19.4,tgt:13,start:22.6,u:'%'},
-  {lbl:'Músculo → 69 kg',cur:66.72,tgt:69,start:65.65,u:'kg'},
-  {lbl:'G. Visceral → 5',cur:10,tgt:5,start:14,u:''},
-];
-const obEl=document.getElementById('objetivos');
-obEl.style.display='flex';obEl.style.flexDirection='column';obEl.style.gap='10px';
-goals.forEach(g=>{
-  const p=calcPct(g.cur,g.tgt,g.start);
-  obEl.innerHTML+=`<div class="pi">
+// ═══════════════════════════════════════════════
+// SNAPSHOT GRID
+// ═══════════════════════════════════════════════
+const snapEl = document.getElementById('snapGrid');
+medidas.forEach((m, i) => {
+  const prev = i > 0 ? medidas[i-1] : null;
+  const fields = [
+    {l:'Peso', v:m.peso+'kg', d: prev ? delta(m.peso,prev.peso)+'kg' : null, low:true},
+    {l:'% Grasa', v:m.grasa+'%', d: prev ? delta(m.grasa,prev.grasa)+'%' : null, low:true},
+    {l:'IMC', v:m.imc, d: prev ? delta(m.imc,prev.imc) : null, low:true},
+    {l:'Cintura', v:m.cintura+'cm', d: prev ? delta(m.cintura,prev.cintura)+'cm' : null, low:true},
+    {l:'Hombros', v:m.hombros+'cm', d: prev ? delta(m.hombros,prev.hombros)+'cm' : null, low:false},
+    {l:'Pecho', v:m.pecho+'cm', d: prev ? delta(m.pecho,prev.pecho)+'cm' : null, low:false},
+    {l:'Bíceps', v:m.biceps+'cm', d: prev ? delta(m.biceps,prev.biceps)+'cm' : null, low:false},
+  ];
+  let rows = fields.map(f => {
+    let dHtml = '';
+    if (f.d) {
+      const dNum = parseFloat(f.d);
+      const good = f.low ? dNum < 0 : dNum > 0;
+      const col = good ? '#10b981' : (dNum === 0 ? '#64748b' : '#ef4444');
+      dHtml = `<span class="snap-delta" style="color:${col}">${f.d}</span>`;
+    }
+    return `<div class="snap-row"><span class="snap-label">${f.l}</span><span class="snap-val">${f.v}${dHtml}</span></div>`;
+  }).join('');
+  const isLatest = i === medidas.length - 1;
+  snapEl.innerHTML += `<div class="snap-card" style="${isLatest ? 'border-color:rgba(245,158,11,.4);' : ''}">
+    <div class="snap-date" style="${isLatest ? 'color:#f59e0b' : ''}">${isLatest ? '⭐ ' : ''}${m.d}${isLatest ? ' · Más reciente' : ''}</div>
+    ${rows}
+  </div>`;
+});
+
+// ═══════════════════════════════════════════════
+// OBJETIVOS
+// ═══════════════════════════════════════════════
+const obEl = document.getElementById('objetivos');
+obEl.style.cssText = 'display:flex;flex-direction:column;gap:10px';
+[
+  {lbl:'Peso → 83 kg', cur:ultimo.peso, tgt:targets.peso, start:inicio.peso, u:'kg'},
+  {lbl:'Grasa → 13%', cur:ultimo.grasa, tgt:targets.grasa, start:inicio.grasa, u:'%'},
+  {lbl:'Músculo → 69 kg', cur:lcComp.musculo, tgt:targets.musculo, start:65.65, u:'kg'},
+  {lbl:'Cintura → 85.5 cm', cur:ultimo.cintura, tgt:targets.cintura, start:inicio.cintura, u:'cm'},
+].forEach(g => {
+  const p = pct(g.cur, g.tgt, g.start);
+  obEl.innerHTML += `<div class="pi">
     <div class="pt"><span class="pl">${g.lbl}</span><span class="pp">${p.toFixed(1)}%</span></div>
-    <div class="pv"><span class="pc">${g.cur}<span style="font-size:11px;color:#475569;margin-left:2px">${g.u}</span></span><span class="ptg">→ ${g.tgt}${g.u}</span></div>
+    <div class="pv">
+      <span class="pc2">${g.cur}<span style="font-size:11px;color:#475569;margin-left:2px">${g.u}</span></span>
+      <span class="ptg">→ ${g.tgt}${g.u}</span>
+    </div>
     <div class="pb"><div class="pf" style="width:${p}%"></div></div>
   </div>`;
 });
 
-// ─── KPI CARDS ────────────────────────────────
-const kpiEl=document.getElementById('kpiCards');
-kpis.forEach(k=>{
-  kpiEl.innerHTML+=`<div class="card kc">
+// ═══════════════════════════════════════════════
+// KPI CARDS
+// ═══════════════════════════════════════════════
+const adonis = +(ultimo.hombros / ultimo.cintura).toFixed(3);
+const golden = +(ultimo.pecho / ultimo.cintura).toFixed(3);
+const whtr   = +(ultimo.cintura / 190).toFixed(3);
+const bicMun = +(ultimo.biceps / ultimo.munieca).toFixed(2);
+
+const kpis = [
+  {nm:'WHtR', v:whtr, t:'< 0.47', ok:whtr < 0.5,
+   desc:'Relación cintura/estatura. < 0.50 saludable; < 0.47 óptimo. Actual: '+ultimo.cintura+'cm / 190cm.',
+   tip:'Faltan '+(ultimo.cintura-85.5).toFixed(1)+' cm de cintura para WHtR óptimo. Cardio en ayunas 4×/semana.'},
+  {nm:'Adonis Index', v:adonis, t:'1.618', ok:Math.abs(adonis-1.618)<0.1,
+   desc:'Ratio hombros/cintura. La proporción áurea del físico masculino. Objetivo: 1.618.',
+   tip:'Necesitas: hombros +15.3 cm y/o cintura -7.5 cm. Ambos en paralelo maximizan el impacto.'},
+  {nm:'Golden Ratio', v:golden, t:'1.3–1.5', ok:golden>=1.3&&golden<=1.5,
+   desc:'Relación pecho/cintura. Indica desarrollo del torso superior. Tu pecho: '+ultimo.pecho+'cm.',
+   tip:'¡Ya estás en rango! Pecho '+ultimo.pecho+'cm / Cintura '+ultimo.cintura+'cm = '+golden+'. Mantener.'},
+  {nm:'Bíceps/Muñeca', v:bicMun, t:'2.5', ok:bicMun>=2.4,
+   desc:'Ratio bíceps/muñeca. Indica desarrollo muscular proporcional al frame óseo (muñeca 17.5cm).',
+   tip:'Actual: '+ultimo.biceps+'cm. Ideal: '+targets.biceps+'cm. Faltan '+(targets.biceps-ultimo.biceps).toFixed(1)+' cm. Curl 2×/semana.'},
+  {nm:'IMC', v:ultimo.imc, t:'23.0', ok:ultimo.imc<25,
+   desc:'IMC actual: '+ultimo.imc+'. Objetivo: 23 (atlético). Bajó de 25.53 en Feb 16.',
+   tip:'Al llegar a 83 kg tu IMC será ~23. Preserva masa muscular con proteína 2g/kg/día.'},
+  {nm:'Grasa Visceral', v:lcComp.visceral, t:'5', ok:lcComp.visceral<=9,
+   desc:'Grasa visceral (escala 1–59). Bajó de 14 (16/2) a 13 (desde 19/2). Rango saludable: < 10.',
+   tip:'Bajó 1 punto. 30 min cardio MISS post-entrenamiento + sueño 7–8h para seguir reduciéndola.'},
+];
+
+const kpiEl = document.getElementById('kpiCards');
+kpis.forEach(k => {
+  kpiEl.innerHTML += `<div class="card kc">
     <div class="kt">
       <span class="kn">${k.nm}</span>
       <span class="kb" style="background:${k.ok?'rgba(16,185,129,.15)':'rgba(245,158,11,.15)'};color:${k.ok?'#10b981':'#f59e0b'}">${k.ok?'✓ Óptimo':'En progreso'}</span>
@@ -313,14 +416,25 @@ kpis.forEach(k=>{
   </div>`;
 });
 
-// ─── TABLA ────────────────────────────────────
-const tabEl=document.getElementById('tablaComp');
-let rows='';
-zones.forEach(z=>{
-  const diff=z.a-z.id,p=z.a/z.id*100;
-  const ok=p>=95&&p<=105,hi=p>105;
-  const col=ok?'#10b981':hi?'#ef4444':'#f59e0b';
-  rows+=`<tr>
+// ═══════════════════════════════════════════════
+// TABLA COMPARATIVA
+// ═══════════════════════════════════════════════
+const zones = [
+  {z:'Hombros',  a:ultimo.hombros,     id:targets.hombros,     u:'cm'},
+  {z:'Cintura',  a:ultimo.cintura,     id:targets.cintura,     u:'cm'},
+  {z:'Pecho',    a:ultimo.pecho,       id:targets.pecho,       u:'cm'},
+  {z:'Bíceps',   a:ultimo.biceps,      id:targets.biceps,      u:'cm'},
+  {z:'Antebrazo',a:ultimo.antebrazo,   id:targets.antebrazo,   u:'cm'},
+  {z:'Cadera',   a:ultimo.cadera,      id:targets.cadera,      u:'cm'},
+  {z:'Muslo',    a:ultimo.muslo,       id:targets.muslo,       u:'cm'},
+  {z:'Pantorrilla',a:ultimo.pantorrilla,id:targets.pantorrilla,u:'cm'},
+];
+let rows = '';
+zones.forEach(z => {
+  const diff = z.a - z.id, p = z.a / z.id * 100;
+  const ok = p>=95&&p<=105, hi = p>105;
+  const col = ok?'#10b981':hi?'#ef4444':'#f59e0b';
+  rows += `<tr>
     <td style="font-weight:600;color:#e2e8f0">${z.z}</td>
     <td style="color:#cbd5e1">${z.a.toFixed(1)} ${z.u}</td>
     <td style="color:#f59e0b">${z.id.toFixed(1)} ${z.u}</td>
@@ -329,12 +443,44 @@ zones.forEach(z=>{
     <td><div class="mbar"><div class="mf" style="width:${Math.min(p,100)}%;background:${col}"></div></div></td>
   </tr>`;
 });
-tabEl.innerHTML=`<table><thead><tr><th>Zona</th><th>Actual</th><th>Ideal</th><th>Diferencia</th><th>% Ideal</th><th>Progreso</th></tr></thead><tbody>${rows}</tbody></table>`;
+document.getElementById('tablaComp').innerHTML = `<table>
+  <thead><tr><th>Zona</th><th>Actual (01/03)</th><th>Ideal</th><th>Diferencia</th><th>% Ideal</th><th>Progreso</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>`;
 
-// ─── QUICK WINS ───────────────────────────────
-const winsEl=document.getElementById('winsCards');
-zones.forEach((w,i)=>{
-  winsEl.innerHTML+=`<div class="wc">
+// ═══════════════════════════════════════════════
+// QUICK WINS
+// ═══════════════════════════════════════════════
+const wins = [
+  {z:'Cintura',a:ultimo.cintura,id:targets.cintura,u:'cm',
+   title:'Reducir Cintura → 85.5 cm',
+   reason:'La cintura es el denominador de TODOS tus ratios. Bajarla +7.5 cm lleva el Adonis Index de 1.323 a ~1.440 sólo con este cambio.',
+   impact:`Faltan ${(ultimo.cintura-targets.cintura).toFixed(1)} cm. Cada cm menos = +0.015 Adonis Index. Progreso real: 100→93 cm en 13 días.`,
+   tl:'4–6 sem',pc:'linear-gradient(90deg,#f43f5e,#dc2626)',pt:'CRÍTICO',pb:'rgba(244,63,94,.15)',pcc:'#f43f5e',
+   acts:['Déficit 400–500 kcal/día (tus datos muestran días extremos — no necesario)','Cardio en ayunas 30 min, 4×/semana','Planchas y vacuum abdominal diario','Reducir sodio para bajar retención de agua']},
+  {z:'Hombros',a:ultimo.hombros,id:targets.hombros,u:'cm',
+   title:'Desarrollar Hombros → 138.3 cm',
+   reason:'Con cintura en 93 cm, necesitas 150+ cm de hombros para Adonis Index 1.618. Desarrollar delts es la palanca más poderosa.',
+   impact:`Faltan ${(targets.hombros-ultimo.hombros).toFixed(1)} cm. Con cintura 85.5 y hombros 138.3 = Adonis Index 1.618 perfecto.`,
+   tl:'12–16 sem',pc:'linear-gradient(90deg,#f43f5e,#dc2626)',pt:'CRÍTICO',pb:'rgba(244,63,94,.15)',pcc:'#f43f5e',
+   acts:['Press militar con barra 3×5 (fuerza base)','Elevaciones laterales 4×15 (ancho visual)','Face pulls 3×20 (salud del manguito)','Frecuencia: 2–3 veces/semana']},
+  {z:'Bíceps',a:ultimo.biceps,id:targets.biceps,u:'cm',
+   title:'Ganar Masa en Bíceps → 43.8 cm',
+   reason:`Ratio actual bíceps/muñeca: ${bicMun} (objetivo: 2.5). Con tu frame óseo el potencial es claro.`,
+   impact:`Faltan ${(targets.biceps-ultimo.biceps).toFixed(1)} cm para el ideal. Muy visible en camiseta.`,
+   tl:'16–24 sem',pc:'linear-gradient(90deg,#f97316,#d97706)',pt:'ALTA',pb:'rgba(249,115,22,.15)',pcc:'#f97316',
+   acts:['Curl barra EZ 4×8–10','Curl martillo 3×12','Curl concentrado 3×12 por brazo','Máx. 2 días directos/semana']},
+  {z:'Muslo',a:ultimo.muslo,id:targets.muslo,u:'cm',
+   title:'Desarrollar Cuádriceps → 66.7 cm',
+   reason:'Muslo actual 56 cm vs ideal 66.7 cm. El equilibrio pierna/torso completa el físico proporcional.',
+   impact:`Faltan ${(targets.muslo-ultimo.muslo).toFixed(1)} cm. Impacto en simetría y fuerza funcional.`,
+   tl:'20–30 sem',pc:'linear-gradient(90deg,#f59e0b,#eab308)',pt:'MEDIA',pb:'rgba(245,158,11,.15)',pcc:'#f59e0b',
+   acts:['Sentadilla trasera 4×5–8','Prensa de piernas 3×12–15','Extensiones cuádriceps 3×15','2× semana']},
+];
+
+const winsEl = document.getElementById('winsCards');
+wins.forEach((w, i) => {
+  winsEl.innerHTML += `<div class="wc">
     <div class="ws" style="background:${w.pc}"></div>
     <div class="wb">
       <div class="wh">
@@ -348,96 +494,139 @@ zones.forEach((w,i)=>{
       <div class="wd" id="wd${i}">
         <div class="wi"><div class="wil">💡 IMPACTO:</div><div class="wit">${w.impact}</div></div>
         <div class="wsr">
-          <div class="wst"><div class="wsl">Diferencia</div><div class="wsv" style="color:#f59e0b">${Math.abs(w.a-w.id).toFixed(1)} cm</div></div>
-          <div class="wst"><div class="wsl">Timeline</div><div class="wsv" style="color:#10b981">${w.tl}</div></div>
+          <div class="wst2"><div class="wsl">Diferencia</div><div class="wsv" style="color:#f59e0b">${Math.abs(w.a-w.id).toFixed(1)} cm</div></div>
+          <div class="wst2"><div class="wsl">Timeline</div><div class="wsv" style="color:#10b981">${w.tl}</div></div>
         </div>
-        <div style="font-weight:600;font-size:12px;color:#cbd5e1;margin-bottom:8px">Acciones:</div>
+        <div style="font-weight:600;font-size:12px;color:#cbd5e1;margin-bottom:8px">Acciones recomendadas:</div>
         ${w.acts.map(a=>`<div class="wa"><span class="waw">→</span>${a}</div>`).join('')}
       </div>
     </div>
   </div>`;
 });
 
-function toggleWin(i){
-  const d=document.getElementById('wd'+i);
+function toggleWin(i) {
+  const d = document.getElementById('wd'+i);
   d.classList.toggle('on');
-  const btn=d.closest('.wc').querySelector('.wtgl');
-  btn.textContent=d.classList.contains('on')?'▲':'▼';
+  d.closest('.wc').querySelector('.wtgl').textContent = d.classList.contains('on') ? '▲' : '▼';
 }
 
-// ─── CHARTS ───────────────────────────────────
-function initCharts(){
-  const base={color:'#94a3b8',grid:{color:'#1e293b'},ticks:{color:'#94a3b8',font:{size:11}}};
+// ═══════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════
+function initCharts() {
+  const gridColor = '#1e293b', tickColor = '#64748b';
 
-  // Peso & Grasa
-  new Chart(document.getElementById('chartPeso'),{
-    type:'line',
-    data:{
-      labels:dias,
-      datasets:[
-        {label:'Peso (kg)',data:pesos,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.12)',tension:.3,yAxisID:'y',pointRadius:3,borderWidth:2.5,fill:true},
-        {label:'% Grasa',data:grasas,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.1)',tension:.3,yAxisID:'y2',pointRadius:3,borderWidth:2.5,fill:true},
+  // 1. Peso & Grasa (3 fechas reales)
+  new Chart(document.getElementById('chartPeso'), {
+    type: 'line',
+    data: {
+      labels: medidas.map(m=>m.d),
+      datasets: [
+        {label:'Peso (kg)', data:medidas.map(m=>m.peso), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.12)', tension:.3, yAxisID:'y', pointRadius:6, pointBackgroundColor:'#f59e0b', borderWidth:2.5, fill:true},
+        {label:'% Grasa',   data:medidas.map(m=>m.grasa), borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,.1)', tension:.3, yAxisID:'y2', pointRadius:6, pointBackgroundColor:'#a855f7', borderWidth:2.5, fill:true},
       ]
     },
-    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
-      x:{...base.grid,...{ticks:{color:'#64748b',font:{size:10}}}},
-      y:{...base,min:88,max:94,title:{display:true,text:'Peso (kg)',color:'#f59e0b',font:{size:10}}},
-      y2:{...base,min:18,max:24,position:'right',title:{display:true,text:'% Grasa',color:'#a855f7',font:{size:10}},grid:{display:false}},
-    }}
+    options:{responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:tickColor,font:{size:11}}, grid:{color:gridColor}},
+        y:{ticks:{color:'#f59e0b',font:{size:10}}, min:87, max:94, grid:{color:gridColor}, title:{display:true,text:'Peso kg',color:'#f59e0b',font:{size:10}}},
+        y2:{ticks:{color:'#a855f7',font:{size:10}}, min:21, max:27, position:'right', grid:{display:false}, title:{display:true,text:'% Grasa',color:'#a855f7',font:{size:10}}},
+      }
+    }
   });
 
-  // Composición
-  new Chart(document.getElementById('chartComp'),{
-    type:'line',
-    data:{
-      labels:diasComp,
-      datasets:[
-        {label:'Masa Muscular (kg)',data:musculos,borderColor:'#06b6d4',tension:.3,yAxisID:'y',pointRadius:4,borderWidth:2.5,backgroundColor:'rgba(6,182,212,.1)',fill:true},
-        {label:'Grasa Visceral',data:visceral,borderColor:'#f59e0b',tension:.3,yAxisID:'y2',pointRadius:4,borderWidth:2.5,backgroundColor:'rgba(245,158,11,.1)',fill:true},
+  // 2. Composición (5 fechas)
+  new Chart(document.getElementById('chartComp'), {
+    type: 'line',
+    data: {
+      labels: composicion.map(c=>c.d),
+      datasets: [
+        {label:'Masa Muscular (kg)', data:composicion.map(c=>c.musculo), borderColor:'#06b6d4', backgroundColor:'rgba(6,182,212,.1)', tension:.3, yAxisID:'y', pointRadius:5, borderWidth:2.5, fill:true},
+        {label:'Grasa Visceral',     data:composicion.map(c=>c.visceral), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.1)', tension:.3, yAxisID:'y2', pointRadius:5, borderWidth:2.5, fill:true},
+        {label:'% Grasa Subcutánea', data:composicion.map(c=>c.subcutanea), borderColor:'#a855f7', borderDash:[4,4], tension:.3, yAxisID:'y2', pointRadius:4, borderWidth:1.5, fill:false},
       ]
     },
-    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
-      x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#1e293b'}},
-      y:{ticks:{color:'#06b6d4',font:{size:10}},min:65,max:68,grid:{color:'#1e293b'}},
-      y2:{ticks:{color:'#f59e0b',font:{size:10}},min:9,max:15,position:'right',grid:{display:false}},
-    }}
+    options:{responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:tickColor,font:{size:10}}, grid:{color:gridColor}},
+        y:{ticks:{color:'#06b6d4',font:{size:10}}, min:63, max:67, grid:{color:gridColor}},
+        y2:{ticks:{color:'#f59e0b',font:{size:10}}, min:12, max:21, position:'right', grid:{display:false}},
+      }
+    }
   });
 
-  // Nutrición
-  new Chart(document.getElementById('chartNutr'),{
-    type:'bar',
-    data:{
-      labels:diasNutr,
-      datasets:[
-        {label:'Consumidas (kcal)',data:consumidas,backgroundColor:'rgba(16,185,129,.7)',borderRadius:4},
-        {label:'Quemadas (kcal)',data:quemadas,backgroundColor:'rgba(245,158,11,.7)',borderRadius:4},
+  // 3. Nutrición
+  new Chart(document.getElementById('chartNutr'), {
+    type: 'bar',
+    data: {
+      labels: nutricion.map(n=>n.d),
+      datasets: [
+        {label:'Consumidas (kcal)', data:nutricion.map(n=>n.consumidas), backgroundColor:'rgba(16,185,129,.7)', borderRadius:4},
+        {label:'Quemadas (kcal)',   data:nutricion.map(n=>n.quemadas),   backgroundColor:'rgba(245,158,11,.7)', borderRadius:4},
       ]
     },
-    options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
-      x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#1e293b'}},
-      y:{ticks:{color:'#94a3b8',font:{size:10}},min:1500,max:3000,grid:{color:'#1e293b'}},
-    }}
+    options:{responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:tickColor,font:{size:10}}, grid:{color:gridColor}},
+        y:{ticks:{color:'#94a3b8',font:{size:10}}, min:0, max:2200, grid:{color:gridColor}},
+      }
+    }
   });
 
-  // Radar
-  new Chart(document.getElementById('chartRadar'),{
-    type:'radar',
-    data:{
-      labels:zones.map(z=>z.z),
-      datasets:[
-        {label:'Actual (% del ideal)',data:zones.map(z=>Math.round(z.a/z.id*100)),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.2)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#f59e0b'},
-        {label:'Objetivo 100%',data:zones.map(()=>100),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.06)',borderWidth:1.5,borderDash:[5,5],pointRadius:0},
+  // 4. Medidas corporales (3 fechas)
+  new Chart(document.getElementById('chartMedidas'), {
+    type: 'line',
+    data: {
+      labels: medidas.map(m=>m.d),
+      datasets: [
+        {label:'Cintura (cm)', data:medidas.map(m=>m.cintura), borderColor:'#ef4444', tension:.3, pointRadius:6, borderWidth:2.5},
+        {label:'Hombros (cm)', data:medidas.map(m=>m.hombros), borderColor:'#f59e0b', tension:.3, pointRadius:6, borderWidth:2.5},
+        {label:'Pecho (cm)',   data:medidas.map(m=>m.pecho),   borderColor:'#06b6d4', tension:.3, pointRadius:6, borderWidth:2.5},
+        {label:'Bíceps (cm)',  data:medidas.map(m=>m.biceps),  borderColor:'#a855f7', tension:.3, pointRadius:6, borderWidth:2.5},
       ]
     },
-    options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{
-      r:{ticks:{color:'#334155',backdropColor:'transparent',font:{size:10}},grid:{color:'#1e293b'},pointLabels:{color:'#94a3b8',font:{size:12}},min:0,max:110,},
-    }}
+    options:{responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:tickColor,font:{size:11}}, grid:{color:gridColor}},
+        y:{ticks:{color:'#94a3b8',font:{size:10}}, min:30, max:135, grid:{color:gridColor}},
+      }
+    }
+  });
+
+  // 5. Radar actual vs ideal
+  new Chart(document.getElementById('chartRadar'), {
+    type: 'radar',
+    data: {
+      labels: zones.map(z=>z.z),
+      datasets: [
+        {label:'Actual 01/03 (% del ideal)', data:zones.map(z=>Math.round(z.a/z.id*100)), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.2)', borderWidth:2, pointRadius:4, pointBackgroundColor:'#f59e0b'},
+        {label:'Inicio 16 Feb (%)',           data:[
+          Math.round(inicio.hombros/targets.hombros*100),
+          Math.round(inicio.cintura/targets.cintura*100),
+          Math.round(inicio.pecho/targets.pecho*100),
+          Math.round(inicio.biceps/targets.biceps*100),
+          Math.round(inicio.antebrazo/targets.antebrazo*100),
+          Math.round(inicio.cadera/targets.cadera*100),
+          Math.round(inicio.muslo/targets.muslo*100),
+          Math.round(inicio.pantorrilla/targets.pantorrilla*100),
+        ], borderColor:'#475569', backgroundColor:'rgba(71,85,105,.1)', borderWidth:1.5, borderDash:[4,4], pointRadius:3},
+        {label:'Objetivo 100%', data:zones.map(()=>100), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,.05)', borderWidth:1, borderDash:[5,5], pointRadius:0},
+      ]
+    },
+    options:{responsive:true,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{r:{ticks:{color:'#334155',backdropColor:'transparent',font:{size:9}}, grid:{color:'#1e293b'}, pointLabels:{color:'#94a3b8',font:{size:11}}, min:0, max:120}}
+    }
   });
 }
 
-// Init charts on first load for overview tab
+// Init charts inmediato para la tab overview
 initCharts();
-chartsInit=true;
+chartsInited = true;
 </script>
 </body>
 </html>
