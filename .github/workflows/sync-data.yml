@@ -1,0 +1,45 @@
+name: Sync Excel → bodyData.ts
+
+# Triggers when the Excel file is pushed, or manually
+on:
+  push:
+    paths:
+      - 'Tracking-Body-Sculp.xlsx'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Need full write access to push the updated file
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Excel sync
+        run: npm run sync
+
+      - name: Commit updated bodyData.ts
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name  "github-actions[bot]"
+          git add src/data/bodyData.ts
+          if git diff --staged --quiet; then
+            echo "No data changes detected — nothing to commit."
+          else
+            git commit -m "🔄 Auto-sync: bodyData.ts updated from Excel [skip ci]"
+            git push
+          fi

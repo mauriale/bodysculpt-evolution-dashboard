@@ -30,6 +30,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Sync Excel data (if file exists)
+        run: |
+          if [ -f "Tracking-Body-Sculp.xlsx" ]; then
+            echo "📊 Running Excel sync before build..."
+            npm run sync
+          else
+            echo "⚠️  No Excel file found, using static bodyData.ts"
+          fi
+
       - name: Install missing shadcn/ui components
         run: |
           npx shadcn@latest add card --yes --overwrite 2>/dev/null || true

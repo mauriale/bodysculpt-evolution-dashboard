@@ -1,6 +1,6 @@
-// BodySculpt Evolution — Data Layer
-// Datos de seguimiento de transformación física: 16 Feb - 24 Feb 2026
-// Datos de un usuario: Hombre, 190cm, muñeca 17.5cm
+// BodySculpt Evolution — Static Data Layer (fallback / build-time snapshot)
+// Auto-updated by: npm run sync  |  or GitHub Actions on Excel push
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -52,10 +52,9 @@ export interface BodyComparison {
 }
 
 // ─── Raw Data ─────────────────────────────────────────────────────────────────
-// Período: 16 de Febrero al 24 de Febrero 2026 (8 días)
+// Período: 16 de Febrero al 3 de Marzo 2026
 // Perfil: Hombre 190 cm, muñeca 17.5 cm
 // Inicio: 92.59 kg, 22.6% grasa, BMI 25.7
-// Actual: 89.03 kg, 19.4% grasa, BMI 24.7
 
 export const measurements: Measurement[] = [
   { date: '2026-02-16', weight: 92.59, bodyFat: 22.6, bmi: 25.7, waist: 94 },
@@ -101,10 +100,6 @@ export const getLatestComposition = (): BodyComposition =>
 
 // ─── Calculations ─────────────────────────────────────────────────────────────
 
-/**
- * Calculates progress percentage toward a target.
- * Returns 0-100, where 100 = target reached.
- */
 export const calculateProgress = (
   current: number,
   target: number,
@@ -116,34 +111,24 @@ export const calculateProgress = (
   return Math.min((achievedChange / totalChange) * 100, 100);
 };
 
-/**
- * Calculates scientific KPIs based on the latest measurement.
- * Height: 190cm, wrist: 17.5cm
- */
 export const calculateKPIs = (measurement: Measurement): KPI[] => {
   const height = 190;
   const wrist = 17.5;
 
-  // Ideal waist (McCallum / height ratio)
-  const idealWaist = height * 0.45; // 85.5 cm
+  const idealWaist = height * 0.45;
   const currentWaist = measurement.waist ?? 88;
 
-  // WHtR: waist-to-height ratio
   const whtr = currentWaist / height;
 
-  // Adonis Index: shoulder / waist
-  // Ideal shoulder = waist * 1.618
-  const idealShoulder = idealWaist * 1.618; // ~138.3 cm (target)
-  const currentShoulder = 125; // measured
+  const idealShoulder = idealWaist * 1.618;
+  const currentShoulder = 125;
   const adonisIndex = currentShoulder / currentWaist;
 
-  // Golden Ratio: chest / waist
-  const idealChest = wrist * 6.5; // 113.75 cm
+  const idealChest = wrist * 6.5;
   const currentChest = 113;
   const goldenRatio = currentChest / currentWaist;
 
-  // Ideal biceps
-  const idealBiceps = wrist * 2.5; // 43.75 cm
+  const idealBiceps = wrist * 2.5;
   const currentBiceps = 38;
 
   return [
@@ -192,15 +177,10 @@ export const calculateKPIs = (measurement: Measurement): KPI[] => {
   ];
 };
 
-/**
- * Returns comparison between current and ideal measurements by body zone.
- * Based on McCallum formula (wrist = 17.5 cm, height = 190 cm).
- */
 export const getComparisons = (measurement: Measurement): BodyComparison[] => {
   const wrist = 17.5;
   const height = 190;
 
-  // Current values (can be expanded with real measurements)
   const current = {
     shoulders: 125,
     chest: 113,
@@ -213,18 +193,17 @@ export const getComparisons = (measurement: Measurement): BodyComparison[] => {
     hip: 94,
   };
 
-  // Ideal values based on McCallum + Golden Ratio
-  const idealWaist = height * 0.45; // 85.5
+  const idealWaist = height * 0.45;
   const ideal = {
-    shoulders: idealWaist * 1.618,   // 138.3
-    chest: wrist * 6.5,              // 113.75
-    waist: idealWaist,               // 85.5
-    biceps: wrist * 2.5,             // 43.75
-    forearm: wrist * 2.0,            // 35.0
-    thigh: idealWaist * 0.78,        // 66.7
-    calf: wrist * 2.5,               // 43.75
-    neck: idealWaist * 0.37,         // 31.6
-    hip: idealWaist * 1.1,           // 94.1
+    shoulders: idealWaist * 1.618,
+    chest: wrist * 6.5,
+    waist: idealWaist,
+    biceps: wrist * 2.5,
+    forearm: wrist * 2.0,
+    thigh: idealWaist * 0.78,
+    calf: wrist * 2.5,
+    neck: idealWaist * 0.37,
+    hip: idealWaist * 1.1,
   };
 
   return [
@@ -354,10 +333,6 @@ export const getComparisons = (measurement: Measurement): BodyComparison[] => {
   ];
 };
 
-/**
- * Extracts and sorts the top "Quick Wins" — zones with highest impact
- * relative to the difference from ideal.
- */
 export const getQuickWins = (comparisons: BodyComparison[]): BodyComparison[] => {
   return [...comparisons]
     .sort((a, b) => a.priority - b.priority || b.difference - a.difference)
