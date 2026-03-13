@@ -53,34 +53,34 @@ export interface BodyComparison {
 
 // ─── Raw Data ─────────────────────────────────────────────────────────────────
 // Last synced: 2026-03-13 | Rows: 4
-// Period: 2026-02-15  →  2026-03-06
+// Period: 2026-02-16  →  2026-03-07
 // Start: 92.15 kg, 25.8% grasa   Latest: 88.56 kg, 22.62% grasa
 
 export const measurements = [
-  {"date":"2026-02-15","weight":92.15,"bodyFat":25.8,"bmi":25.53,"waist":100},
-  {"date":"2026-02-23","weight":88.59,"bodyFat":22.6,"bmi":24.54,"waist":94},
-  {"date":"2026-02-28","weight":89.17,"bodyFat":22.93,"bmi":24.96,"waist":93},
-  {"date":"2026-03-06","weight":88.56,"bodyFat":22.62,"bmi":24.79,"waist":93}
+  {"date":"2026-02-16","weight":92.15,"bodyFat":25.8,"bmi":25.53,"waist":100},
+  {"date":"2026-02-24","weight":88.59,"bodyFat":22.6,"bmi":24.54,"waist":94},
+  {"date":"2026-03-01","weight":89.17,"bodyFat":22.93,"bmi":24.96,"waist":93},
+  {"date":"2026-03-07","weight":88.56,"bodyFat":22.62,"bmi":24.79,"waist":93}
 ];
 
 export const bodyCompositions = [
-  {"date":"2026-02-15","muscleMass":66,"visceralFat":14},
-  {"date":"2026-02-18","muscleMass":64.88,"visceralFat":13,"water":50.08},
-  {"date":"2026-02-20","muscleMass":64.27,"visceralFat":13,"water":56.66},
-  {"date":"2026-02-23","muscleMass":64.78,"visceralFat":13,"water":56.46},
-  {"date":"2026-02-28","muscleMass":64.99,"visceralFat":13,"water":56.26},
-  {"date":"2026-03-06","muscleMass":64.79,"visceralFat":13,"water":56.48}
+  {"date":"2026-02-16","muscleMass":66,"visceralFat":14},
+  {"date":"2026-02-19","muscleMass":64.88,"visceralFat":13,"water":50.08},
+  {"date":"2026-02-21","muscleMass":64.27,"visceralFat":13,"water":56.66},
+  {"date":"2026-02-24","muscleMass":64.78,"visceralFat":13,"water":56.46},
+  {"date":"2026-03-01","muscleMass":64.99,"visceralFat":13,"water":56.26},
+  {"date":"2026-03-07","muscleMass":64.79,"visceralFat":13,"water":56.48}
 ];
 
 export const nutritionData = [
-  {"date":"2026-02-15","caloriesConsumed":1093,"caloriesBurned":987,"protein":0.46,"carbs":0.19,"fat":0.35},
-  {"date":"2026-02-16","caloriesConsumed":1510,"caloriesBurned":323,"protein":0.42,"carbs":0.17,"fat":0.41},
-  {"date":"2026-02-17","caloriesConsumed":991,"caloriesBurned":870,"protein":0.37,"carbs":0.47,"fat":0.16},
-  {"date":"2026-02-18","caloriesConsumed":1137,"caloriesBurned":688,"protein":0.26,"carbs":0.34,"fat":0.4},
-  {"date":"2026-02-19","caloriesConsumed":773,"caloriesBurned":1344,"protein":0.51,"carbs":0.17,"fat":0.32},
-  {"date":"2026-02-20","caloriesConsumed":1706,"caloriesBurned":1050,"protein":0.34,"carbs":0.37,"fat":0.29},
-  {"date":"2026-02-21","caloriesConsumed":1928,"caloriesBurned":214,"protein":0.35,"carbs":0.27,"fat":0.38},
-  {"date":"2026-03-06","caloriesConsumed":1386,"caloriesBurned":546,"protein":0.33,"carbs":0.4,"fat":0.27}
+  {"date":"2026-02-16","caloriesConsumed":1093,"caloriesBurned":987,"protein":0.46,"carbs":0.19,"fat":0.35},
+  {"date":"2026-02-17","caloriesConsumed":1510,"caloriesBurned":323,"protein":0.42,"carbs":0.17,"fat":0.41},
+  {"date":"2026-02-18","caloriesConsumed":991,"caloriesBurned":870,"protein":0.37,"carbs":0.47,"fat":0.16},
+  {"date":"2026-02-19","caloriesConsumed":1137,"caloriesBurned":688,"protein":0.26,"carbs":0.34,"fat":0.4},
+  {"date":"2026-02-20","caloriesConsumed":773,"caloriesBurned":1344,"protein":0.51,"carbs":0.17,"fat":0.32},
+  {"date":"2026-02-21","caloriesConsumed":1706,"caloriesBurned":1050,"protein":0.34,"carbs":0.37,"fat":0.29},
+  {"date":"2026-02-22","caloriesConsumed":1928,"caloriesBurned":214,"protein":0.35,"carbs":0.27,"fat":0.38},
+  {"date":"2026-03-07","caloriesConsumed":1386,"caloriesBurned":546,"protein":0.33,"carbs":0.4,"fat":0.27}
 ];
 
 // ─── Accessors ────────────────────────────────────────────────────────────────
@@ -115,11 +115,9 @@ export const calculateKPIs = (measurement: Measurement): KPI[] => {
 
   const whtr = currentWaist / height;
 
-  const idealShoulder = idealWaist * 1.618;
   const currentShoulder = 125;
   const adonisIndex = currentShoulder / currentWaist;
 
-  const idealChest = wrist * 6.5;
   const currentChest = 113;
   const goldenRatio = currentChest / currentWaist;
 

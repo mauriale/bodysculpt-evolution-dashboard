@@ -18,25 +18,25 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const EXCEL_PATH = resolve(ROOT, 'Tracking-Body-Sculp.xlsx');
-const OUT_PATH   = resolve(ROOT, 'src', 'data', 'bodyData.ts');
-const DRY_RUN    = process.argv.includes('--dry-run');
+const OUT_PATH = resolve(ROOT, 'src', 'data', 'bodyData.ts');
+const DRY_RUN = process.argv.includes('--dry-run');
 
 // ─── Column aliases ────────────────────────────────────────────────────────────
 const COL = {
-  date:             ['fecha', 'date', 'día', 'dia', 'fecha medición'],
-  weight:           ['peso', 'weight', 'peso (kg)', 'peso kg'],
-  bodyFat:          ['grasa', '% grasa', 'grasa corporal', 'grasa (%)', 'body fat', 'bf%'],
-  bmi:              ['imc', 'bmi', 'índice de masa corporal'],
-  waist:            ['cintura', 'waist', 'cintura (cm)', 'abdomen'],
-  muscleMass:       ['masa muscular', 'muscle mass', 'masa muscular (kg)'],
-  visceralFat:      ['grasa visceral', 'visceral fat', 'gv', 'nivel grasa visceral'],
-  boneMass:         ['masa ósea', 'masa osea', 'bone mass', 'hueso (kg)'],
-  water:            ['agua', 'water', '% agua', 'agua (%)'],
+  date: ['fecha', 'date', 'día', 'dia', 'fecha medición'],
+  weight: ['peso', 'weight', 'peso (kg)', 'peso kg'],
+  bodyFat: ['grasa', '% grasa', 'grasa corporal', 'grasa (%)', 'body fat', 'bf%'],
+  bmi: ['imc', 'bmi', 'índice de masa corporal'],
+  waist: ['cintura', 'waist', 'cintura (cm)', 'abdomen'],
+  muscleMass: ['masa muscular', 'muscle mass', 'masa muscular (kg)'],
+  visceralFat: ['grasa visceral', 'visceral fat', 'gv', 'nivel grasa visceral'],
+  boneMass: ['masa ósea', 'masa osea', 'bone mass', 'hueso (kg)'],
+  water: ['agua', 'water', '% agua', 'agua (%)'],
   caloriesConsumed: ['calorías consumidas', 'kcal consumidas', 'calories in', 'consumidas'],
-  caloriesBurned:   ['calorías quemadas', 'kcal quemadas', 'calories out', 'quemadas'],
-  protein:          ['proteína', 'proteina', 'protein', 'proteínas (g)', 'prot'],
-  carbs:            ['carbohidratos', 'carbs', 'hidratos', 'ch (g)'],
-  fat:              ['grasa dieta', 'grasas', 'fat', 'grasas (g)'],
+  caloriesBurned: ['calorías quemadas', 'kcal quemadas', 'calories out', 'quemadas'],
+  protein: ['proteína', 'proteina', 'protein', 'proteínas (g)', 'prot'],
+  carbs: ['carbohidratos', 'carbs', 'hidratos', 'ch (g)'],
+  fat: ['grasa dieta', 'grasas', 'fat', 'grasas (g)'],
 };
 
 function findCol(headers, key) {
@@ -49,18 +49,29 @@ function findCol(headers, key) {
 
 function parseDate(val) {
   if (!val) return null;
-  if (val instanceof Date) return val.toISOString().split('T')[0];
+  if (val instanceof Date) {
+    const y = val.getFullYear();
+    const m = String(val.getMonth() + 1).padStart(2, '0');
+    const d = String(val.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
   if (typeof val === 'number') {
-    const d = XLSX.SSF.parse_date_code(val);
-    if (d) return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+    const SSF = XLSX.SSF || (XLSX.default && XLSX.default.SSF);
+    if (SSF) {
+      const d = SSF.parse_date_code(val);
+      if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+    }
+    // fallback just in case
+    const date = new Date(Math.round((val - 25569) * 86400 * 1000));
+    return date.toISOString().split('T')[0];
   }
   if (typeof val === 'string') {
-    if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0,10);
+    if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0, 10);
     const parts = val.split(/[/\-\.]/);
     if (parts.length === 3) {
-      const [a,b,c] = parts.map(Number);
-      if (c > 1900) return `${c}-${String(b).padStart(2,'0')}-${String(a).padStart(2,'0')}`;
-      if (a > 1900) return `${a}-${String(b).padStart(2,'0')}-${String(c).padStart(2,'0')}`;
+      const [a, b, c] = parts.map(Number);
+      if (c > 1900) return `${c}-${String(b).padStart(2, '0')}-${String(a).padStart(2, '0')}`;
+      if (a > 1900) return `${a}-${String(b).padStart(2, '0')}-${String(c).padStart(2, '0')}`;
     }
   }
   return null;
@@ -76,14 +87,14 @@ if (!existsSync(EXCEL_PATH)) {
 }
 
 console.log('📊  Reading:', EXCEL_PATH);
-const wb = XLSX.read(readFileSync(EXCEL_PATH), { type: 'buffer', cellDates: true });
+const wb = XLSX.read(readFileSync(EXCEL_PATH), { type: 'buffer' });
 
-const measurements     = [];
+const measurements = [];
 const bodyCompositions = [];
-const nutritionData    = [];
+const nutritionData = [];
 
 for (const shName of wb.SheetNames) {
-  const ws   = wb.Sheets[shName];
+  const ws = wb.Sheets[shName];
   const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
   if (rows.length < 2) continue;
 
@@ -95,8 +106,8 @@ for (const shName of wb.SheetNames) {
   const idx = Object.fromEntries(Object.keys(COL).map(k => [k, findCol(headers, k)]));
 
   const hasMeasure = idx.date >= 0 && idx.weight >= 0;
-  const hasComp    = idx.muscleMass >= 0 || idx.visceralFat >= 0;
-  const hasNutr    = idx.caloriesConsumed >= 0 || idx.caloriesBurned >= 0;
+  const hasComp = idx.muscleMass >= 0 || idx.visceralFat >= 0;
+  const hasNutr = idx.caloriesConsumed >= 0 || idx.caloriesBurned >= 0;
   if (!hasMeasure && !hasComp && !hasNutr) continue;
 
   for (let i = hdrIdx + 1; i < rows.length; i++) {
@@ -111,7 +122,7 @@ for (const shName of wb.SheetNames) {
         measurements.push({
           date, weight: w,
           bodyFat: idx.bodyFat >= 0 ? (n(row[idx.bodyFat]) || 0) : 0,
-          bmi:     idx.bmi    >= 0 ? (n(row[idx.bmi])     || 0) : 0,
+          bmi: idx.bmi >= 0 ? (n(row[idx.bmi]) || 0) : 0,
           ...(idx.waist >= 0 && !isNaN(n(row[idx.waist])) ? { waist: n(row[idx.waist]) } : {}),
         });
       }
@@ -122,24 +133,24 @@ for (const shName of wb.SheetNames) {
       if (!isNaN(mm) || !isNaN(vf)) {
         bodyCompositions.push({
           date,
-          muscleMass:  isNaN(mm) ? 0 : mm,
+          muscleMass: isNaN(mm) ? 0 : mm,
           visceralFat: isNaN(vf) ? 0 : vf,
           ...(idx.boneMass >= 0 && !isNaN(n(row[idx.boneMass])) ? { boneMass: n(row[idx.boneMass]) } : {}),
-          ...(idx.water    >= 0 && !isNaN(n(row[idx.water]))    ? { water:    n(row[idx.water])    } : {}),
+          ...(idx.water >= 0 && !isNaN(n(row[idx.water])) ? { water: n(row[idx.water]) } : {}),
         });
       }
     }
     if (hasNutr) {
       const cc = idx.caloriesConsumed >= 0 ? n(row[idx.caloriesConsumed]) : NaN;
-      const cb = idx.caloriesBurned   >= 0 ? n(row[idx.caloriesBurned])   : NaN;
+      const cb = idx.caloriesBurned >= 0 ? n(row[idx.caloriesBurned]) : NaN;
       if (!isNaN(cc) || !isNaN(cb)) {
         nutritionData.push({
           date,
           caloriesConsumed: isNaN(cc) ? 0 : cc,
-          caloriesBurned:   isNaN(cb) ? 0 : cb,
+          caloriesBurned: isNaN(cb) ? 0 : cb,
           ...(idx.protein >= 0 && !isNaN(n(row[idx.protein])) ? { protein: n(row[idx.protein]) } : {}),
-          ...(idx.carbs   >= 0 && !isNaN(n(row[idx.carbs]))   ? { carbs:   n(row[idx.carbs])   } : {}),
-          ...(idx.fat     >= 0 && !isNaN(n(row[idx.fat]))     ? { fat:     n(row[idx.fat])     } : {}),
+          ...(idx.carbs >= 0 && !isNaN(n(row[idx.carbs])) ? { carbs: n(row[idx.carbs]) } : {}),
+          ...(idx.fat >= 0 && !isNaN(n(row[idx.fat])) ? { fat: n(row[idx.fat]) } : {}),
         });
       }
     }
@@ -150,12 +161,12 @@ for (const shName of wb.SheetNames) {
 const dedup = (arr) => {
   const m = new Map();
   arr.forEach(r => m.set(r.date, r));
-  return [...m.values()].sort((a,b) => a.date.localeCompare(b.date));
+  return [...m.values()].sort((a, b) => a.date.localeCompare(b.date));
 };
 
-const finalMeasurements     = dedup(measurements);
+const finalMeasurements = dedup(measurements);
 const finalBodyCompositions = dedup(bodyCompositions);
-const finalNutritionData    = dedup(nutritionData);
+const finalNutritionData = dedup(nutritionData);
 
 console.log(`✅  Parsed:`);
 console.log(`   measurements:     ${finalMeasurements.length} rows`);
@@ -181,19 +192,19 @@ const fmtArray = (arr, label) =>
 // Read current bodyData.ts to preserve the static sections (types + calculations)
 const current = readFileSync(OUT_PATH, 'utf8');
 const dataSection = [
-  fmtArray(finalMeasurements,     'measurements'),
+  fmtArray(finalMeasurements, 'measurements'),
   fmtArray(finalBodyCompositions, 'bodyCompositions'),
-  fmtArray(finalNutritionData,    'nutritionData'),
+  fmtArray(finalNutritionData, 'nutritionData'),
 ].join('\n\n');
 
 // Replace everything between the data markers
 const START_MARKER = '// ─── Raw Data ─────────────────────────────────────────────────────────────────';
-const END_MARKER   = '// ─── Accessors ────────────────────────────────────────────────────────────────';
+const END_MARKER = '// ─── Accessors ────────────────────────────────────────────────────────────────';
 
 const before = current.slice(0, current.indexOf(START_MARKER));
-const after  = current.slice(current.indexOf(END_MARKER));
+const after = current.slice(current.indexOf(END_MARKER));
 
-const first  = finalMeasurements[0];
+const first = finalMeasurements[0];
 const latest = finalMeasurements[finalMeasurements.length - 1];
 const syncDate = new Date().toISOString().split('T')[0];
 
