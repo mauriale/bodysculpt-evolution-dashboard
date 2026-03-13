@@ -52,40 +52,35 @@ export interface BodyComparison {
 }
 
 // ─── Raw Data ─────────────────────────────────────────────────────────────────
-// Período: 16 de Febrero al 3 de Marzo 2026
-// Perfil: Hombre 190 cm, muñeca 17.5 cm
-// Inicio: 92.59 kg, 22.6% grasa, BMI 25.7
+// Last synced: 2026-03-13 | Rows: 4
+// Period: 2026-02-15  →  2026-03-06
+// Start: 92.15 kg, 25.8% grasa   Latest: 88.56 kg, 22.62% grasa
 
-export const measurements: Measurement[] = [
-  { date: '2026-02-16', weight: 92.59, bodyFat: 22.6, bmi: 25.7, waist: 94 },
-  { date: '2026-02-17', weight: 91.80, bodyFat: 22.1, bmi: 25.4, waist: 93 },
-  { date: '2026-02-18', weight: 91.20, bodyFat: 21.6, bmi: 25.2, waist: 92.5 },
-  { date: '2026-02-19', weight: 90.75, bodyFat: 21.2, bmi: 25.1, waist: 92 },
-  { date: '2026-02-20', weight: 90.30, bodyFat: 20.8, bmi: 25.0, waist: 91 },
-  { date: '2026-02-21', weight: 89.90, bodyFat: 20.3, bmi: 24.9, waist: 90 },
-  { date: '2026-02-22', weight: 89.50, bodyFat: 19.9, bmi: 24.8, waist: 89 },
-  { date: '2026-02-23', weight: 89.20, bodyFat: 19.6, bmi: 24.7, waist: 88.5 },
-  { date: '2026-02-24', weight: 89.03, bodyFat: 19.4, bmi: 24.7, waist: 88 },
+export const measurements = [
+  {"date":"2026-02-15","weight":92.15,"bodyFat":25.8,"bmi":25.53,"waist":100},
+  {"date":"2026-02-23","weight":88.59,"bodyFat":22.6,"bmi":24.54,"waist":94},
+  {"date":"2026-02-28","weight":89.17,"bodyFat":22.93,"bmi":24.96,"waist":93},
+  {"date":"2026-03-06","weight":88.56,"bodyFat":22.62,"bmi":24.79,"waist":93}
 ];
 
-export const bodyCompositions: BodyComposition[] = [
-  { date: '2026-02-16', muscleMass: 65.65, visceralFat: 14, boneMass: 3.8, water: 55.2 },
-  { date: '2026-02-18', muscleMass: 65.80, visceralFat: 13, boneMass: 3.8, water: 55.8 },
-  { date: '2026-02-20', muscleMass: 66.10, visceralFat: 12, boneMass: 3.8, water: 56.2 },
-  { date: '2026-02-22', muscleMass: 66.40, visceralFat: 11, boneMass: 3.8, water: 56.8 },
-  { date: '2026-02-24', muscleMass: 66.72, visceralFat: 10, boneMass: 3.8, water: 57.3 },
+export const bodyCompositions = [
+  {"date":"2026-02-15","muscleMass":66,"visceralFat":14},
+  {"date":"2026-02-18","muscleMass":64.88,"visceralFat":13,"water":50.08},
+  {"date":"2026-02-20","muscleMass":64.27,"visceralFat":13,"water":56.66},
+  {"date":"2026-02-23","muscleMass":64.78,"visceralFat":13,"water":56.46},
+  {"date":"2026-02-28","muscleMass":64.99,"visceralFat":13,"water":56.26},
+  {"date":"2026-03-06","muscleMass":64.79,"visceralFat":13,"water":56.48}
 ];
 
-export const nutritionData: NutritionEntry[] = [
-  { date: '2026-02-16', caloriesConsumed: 2100, caloriesBurned: 2650, protein: 185, carbs: 210, fat: 72 },
-  { date: '2026-02-17', caloriesConsumed: 1950, caloriesBurned: 2600, protein: 180, carbs: 185, fat: 68 },
-  { date: '2026-02-18', caloriesConsumed: 2200, caloriesBurned: 2750, protein: 195, carbs: 215, fat: 75 },
-  { date: '2026-02-19', caloriesConsumed: 1800, caloriesBurned: 2500, protein: 175, carbs: 165, fat: 62 },
-  { date: '2026-02-20', caloriesConsumed: 2050, caloriesBurned: 2700, protein: 190, carbs: 200, fat: 70 },
-  { date: '2026-02-21', caloriesConsumed: 1900, caloriesBurned: 2580, protein: 178, carbs: 178, fat: 65 },
-  { date: '2026-02-22', caloriesConsumed: 2150, caloriesBurned: 2720, protein: 192, carbs: 208, fat: 73 },
-  { date: '2026-02-23', caloriesConsumed: 1950, caloriesBurned: 2620, protein: 182, carbs: 188, fat: 67 },
-  { date: '2026-02-24', caloriesConsumed: 2000, caloriesBurned: 2680, protein: 188, carbs: 195, fat: 69 },
+export const nutritionData = [
+  {"date":"2026-02-15","caloriesConsumed":1093,"caloriesBurned":987,"protein":0.46,"carbs":0.19,"fat":0.35},
+  {"date":"2026-02-16","caloriesConsumed":1510,"caloriesBurned":323,"protein":0.42,"carbs":0.17,"fat":0.41},
+  {"date":"2026-02-17","caloriesConsumed":991,"caloriesBurned":870,"protein":0.37,"carbs":0.47,"fat":0.16},
+  {"date":"2026-02-18","caloriesConsumed":1137,"caloriesBurned":688,"protein":0.26,"carbs":0.34,"fat":0.4},
+  {"date":"2026-02-19","caloriesConsumed":773,"caloriesBurned":1344,"protein":0.51,"carbs":0.17,"fat":0.32},
+  {"date":"2026-02-20","caloriesConsumed":1706,"caloriesBurned":1050,"protein":0.34,"carbs":0.37,"fat":0.29},
+  {"date":"2026-02-21","caloriesConsumed":1928,"caloriesBurned":214,"protein":0.35,"carbs":0.27,"fat":0.38},
+  {"date":"2026-03-06","caloriesConsumed":1386,"caloriesBurned":546,"protein":0.33,"carbs":0.4,"fat":0.27}
 ];
 
 // ─── Accessors ────────────────────────────────────────────────────────────────
