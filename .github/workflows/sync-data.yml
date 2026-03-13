@@ -40,6 +40,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No data changes detected — nothing to commit."
           else
-            git commit -m "🔄 Auto-sync: bodyData.ts updated from Excel [skip ci]"
+            git commit -m "🔄 Auto-sync: bodyData.ts updated from Excel"
             git push
           fi

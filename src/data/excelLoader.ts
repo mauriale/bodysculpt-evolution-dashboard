@@ -46,8 +46,14 @@ function parseDate(val: unknown): string | null {
   if (val instanceof Date) return val.toISOString().split('T')[0];
   if (typeof val === 'number') {
     // Excel serial number
-    const d = XLSX.SSF.parse_date_code(val);
-    if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+    const SSF = XLSX.SSF || ((XLSX as any).default && (XLSX as any).default.SSF);
+    if (SSF) {
+      const d = SSF.parse_date_code(val);
+      if (d) return `${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+    }
+    // fallback just in case
+    const date = new Date(Math.round((val - 25569) * 86400 * 1000));
+    return date.toISOString().split('T')[0];
   }
   if (typeof val === 'string') {
     // ISO already
