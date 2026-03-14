@@ -59,7 +59,7 @@ function parseDate(val: unknown): string | null {
     // ISO already
     if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0, 10);
     // DD/MM/YYYY or DD-MM-YYYY
-    const parts = val.split(/[/\-\.]/); 
+    const parts = val.split(/[/.\\-]/); 
     if (parts.length === 3) {
       const nums = parts.map(Number);
       if (nums[2] > 1900) // DD/MM/YYYY
